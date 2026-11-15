@@ -29,6 +29,25 @@ The static and variable fonts are separate families, **Allo** and **Allo Variabl
 
 ## Web
 
+From npm:
+
+```sh
+npm install allo-font
+```
+
+```js
+import "allo-font";            // the full variable font, and the obliques
+// import "allo-font/friendly"; // or: roundness fixed at 50, about half the size
+```
+
+```css
+body {
+  font-family: "Allo", system-ui, sans-serif;
+}
+```
+
+Or host the files yourself, from `fonts/webfonts`:
+
 ```css
 @font-face {
   font-family: "Allo";
@@ -49,7 +68,7 @@ body {
   Default 50.
 - **Smaller file:** `AlloVariableFriendly.woff2` has roundness fixed at 50; `"ROND"` has no effect. Its family name
   is "Allo Variable Friendly".
-- **Obliques:** add an `@font-face` with `font-style: italic` and the matching `font-weight` for each oblique WOFF2
+- **Obliques:** the npm CSS includes them. Self-hosting, add an `@font-face` with `font-style: italic` and the matching `font-weight` for each oblique WOFF2
   you use (`Allo-Oblique.woff2`, `Allo-BoldOblique.woff2`, …).
 
 ## Axes
