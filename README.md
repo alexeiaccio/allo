@@ -17,7 +17,7 @@ arrows that appear when you type them, a host of alternates and symbols, as well
 
 ## Download
 
-Get `Allo-1.0.zip` from the [latest release](https://github.com/joshpuckett/allo/releases/latest):
+Get `Allo-1.0.1.zip` from the [latest release](https://github.com/joshpuckett/allo/releases/latest):
 
 | Folder | Contents |
 |---|---|
@@ -112,7 +112,7 @@ python3 -m venv .venv
 ```
 
 Writes `fonts/` (variable TTF and WOFF2; 18 static OTFs and WOFF2s, autohinted with AFDKO), `fonts/SHA256SUMS` and
-`Allo-1.0.zip`. Dependencies are pinned and `release.json` fixes the timestamp, so builds are reproducible.
+`Allo-1.0.1.zip`. Dependencies are pinned and `release.json` fixes the timestamp, so builds are reproducible.
 
 ## Sources
 

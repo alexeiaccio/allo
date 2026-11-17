@@ -8,6 +8,6 @@
   <anchor x="1423" y="994" name="topr"/>
   <outline>
     <component base="C"/>
-    <component base="cedillacomb" xOffset="462.0" yOffset="-5.0"/>
+    <component base="cedillacomb" xOffset="462" yOffset="-5"/>
   </outline>
 </glyph>

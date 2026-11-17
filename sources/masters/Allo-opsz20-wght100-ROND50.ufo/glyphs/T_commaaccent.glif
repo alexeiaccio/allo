@@ -11,6 +11,6 @@
   <anchor x="598" y="1490" name="top"/>
   <outline>
     <component base="T"/>
-    <component base="cedillacomb" xOffset="422"/>
+    <component base="cedillacomb" xOffset="422" yOffset="11"/>
   </outline>
 </glyph>

@@ -45,8 +45,6 @@ def friendly_web(variable):
     return web
 
 
-# drop_unreachable, the hinting functions and smooth_unhinted are kept identical to the authoring build's,
-# so both builds make the same fonts.
 def drop_unreachable(tt):
     """Take out of a compiled font the glyphs nothing can reach: no character, no GSUB rule makes them,
     and no glyph that is reached uses them as a component (a CFF font has none: they're decomposed).
@@ -61,7 +59,7 @@ def drop_unreachable(tt):
         prune_codepage_ranges=False, recalc_bounds=False, recalc_timestamp=False, recalc_average_width=False,
         recalc_max_context=False)
     before = tt.getGlyphOrder()
-    if "gvar" in tt:  # (the subsetter wants every glyph in it; exact_small leaves out those with no deltas)
+    if "gvar" in tt:
         for name in before:
             tt["gvar"].variations.setdefault(name, [])
     subsetter = subset.Subsetter(options)
@@ -71,21 +69,37 @@ def drop_unreachable(tt):
     return [name for name in before if name not in kept]
 
 
+WIN_PAST = ("circumflexacutecomb.cn", "circumflexgravecomb.cn", "circumflexhookcomb.cn", "circumflextildecomb.cn",
+            "breveacutecomb.cn", "brevegravecomb.cn", "brevetildecomb.cn", "brevecomb_hookabovecomb", "dotbelow", "dotbelowcomb",
+            "cedillacomb")
+WIN_PAST_LIMIT = (2300, 560)
+
+
 def check_win(fonts, win):
     """Every glyph in these fonts (UFOs, every layer) inside the Windows ascent and descent `win`, which all
     seven fonts share (so old Windows apps space them alike); raises if one would be cut off. Raise
     openTypeOS2WinAscent/Descent in every source then."""
     import math
-    hi = lo = 0
+    past_names = set(WIN_PAST)
     for f in fonts:
         for layer in f.layers:
             for g in layer:
+                if any(c.baseGlyph in WIN_PAST for c in g.components): past_names.add(g.name)
+    reach = {False: [0, 0], True: [0, 0]}
+    for f in fonts:
+        for layer in f.layers:
+            for g in layer:
+                past = g.name in past_names
                 pen = BoundsPen(layer)
                 g.draw(pen)
                 if pen.bounds:
-                    hi, lo = max(hi, math.ceil(pen.bounds[3])), max(lo, math.ceil(-pen.bounds[1]))
+                    r = reach[past]
+                    r[0], r[1] = max(r[0], math.ceil(pen.bounds[3])), max(r[1], math.ceil(-pen.bounds[1]))
+    (hi, lo), (phi, plo) = reach[False], reach[True]
     if hi > win[0] or lo > win[1]:
         raise ValueError(f'glyphs reach {hi}/{lo} (ascent/descent), past the Windows metrics {win}')
+    if phi > WIN_PAST_LIMIT[0] or plo > WIN_PAST_LIMIT[1]:
+        raise ValueError(f'stacked accents or the dot below reach {phi}/{plo}, past WIN_PAST_LIMIT {WIN_PAST_LIMIT}')
 
 
 def _crossings(glyphs, name, at, vertical=False):
@@ -93,7 +107,7 @@ def _crossings(glyphs, name, at, vertical=False):
     from fontTools.misc.bezierTools import calcCubicParameters, solveCubic
     pen = DecomposingRecordingPen(glyphs)
     glyphs[name].draw(pen)
-    k = 0 if vertical else 1  # the coordinate the line holds
+    k = 0 if vertical else 1
     hits, start, last = [], None, None
     for op, pts in pen.value:
         if op == "moveTo":
@@ -101,7 +115,7 @@ def _crossings(glyphs, name, at, vertical=False):
             continue
         if op in ("closePath", "endPath"):
             pts = (start,)
-        if op != "curveTo":  # a line, as a cubic
+        if op != "curveTo":
             (x0, y0), (x1, y1) = last, pts[-1]
             pts = ((x0 + (x1 - x0) / 3, y0 + (y1 - y0) / 3), (x0 + 2 * (x1 - x0) / 3, y0 + 2 * (y1 - y0) / 3), pts[-1])
         a, b, c, d = calcCubicParameters(last, *pts)
@@ -126,14 +140,14 @@ def hint_values(fonts):
             glyphs[g].draw(pen)
             return pen.bounds
 
-        low = lambda names: min(box(g)[1] for g in names)  # noqa: E731
-        high = lambda names: max(box(g)[3] for g in names)  # noqa: E731
+        low = lambda names: min(box(g)[1] for g in names)
+        high = lambda names: max(box(g)[3] for g in names)
         over = -low("o O zero e s c".split())
         xh, cap = box("x")[3], min(box(g)[3] for g in ("H", "one"))
         asc = min(box(g)[3] for g in "b d h k l".split())
         here = [(-over, 0), (xh, high("o e s c".split())), (cap, high(["O", "zero"])),
-                (asc, asc + over),  # ascender: flat tops only, so the font's own overshoot as its height
-                (low(["g", "j"]), max(box(g)[1] for g in "p q y".split()))]  # descender (OtherBlues)
+                (asc, asc + over),
+                (low(["g", "j"]), max(box(g)[1] for g in "p q y".split()))]
         zones = here if zones is None else [(min(a, c), max(b, d)) for (a, b), (c, d) in zip(zones, here)]
         n = _crossings(glyphs, "n", xh / 2)
         h = _crossings(glyphs, "H", cap / 4)
@@ -147,11 +161,7 @@ def hint_values(fonts):
     edges = [v for zone in blues for v in zone]
     assert edges == sorted(edges) and len(set(edges)) == len(edges), ("overlapping zones", blues)
     blues, other = [v for zone in blues for v in zone], [v for zone in other for v in zone]
-    # Overshoots are suppressed until they reach 3/4 pixel (the BlueScale rule the fonts had already);
-    # BlueScale × the tallest zone must stay under 1.
     scale = round(0.75 / max(b - a for a, b in zones), 6)
-    # Every font gets the same zones, so FamilyBlues and FamilyOtherBlues would equal them: the
-    # subroutinizer (tx) drops them as redundant, and rasterisers fall back to these.
     return {name: {"BlueValues": blues, "OtherBlues": other, "BlueScale": scale} | s for name, s in stems.items()}
 
 
@@ -172,7 +182,6 @@ def hint_otfs(pairs):
             for key, value in values[name].items():
                 setattr(private, key, value)
             tt.save(path)
-            # one process (its pool needs an importable __main__), no stray fontinfo file
             if otfautohint([str(path), "--ignore-fontinfo", "--traceback", "-p", "1"]):
                 raise RuntimeError(f"otfautohint failed on {path}")
             tt = TTFont(path)
@@ -212,7 +221,7 @@ def exact_small(tt, d):
             gvar.variations.pop(name, None)
 
 
-SMART_DROPOUT = False  # the prep program for Windows' smart dropout control. Off (2026-11-13): with any prep, FreeType stops autohinting the font and its 9-10 px stems go grey (measured), and the gain on Windows couldn't be checked here. gasp alone is harmless.
+SMART_DROPOUT = False
 
 
 def smooth_unhinted(tt):
@@ -223,11 +232,11 @@ def smooth_unhinted(tt):
     from fontTools.ttLib import newTable
     from fontTools.ttLib.tables import ttProgram
     tt['gasp'] = newTable('gasp')
-    tt['gasp'].gaspRange = {0xFFFF: 15}  # every size: grid-fit, greyscale, symmetric smoothing
+    tt['gasp'].gaspRange = {0xFFFF: 15}
     if SMART_DROPOUT:
         tt['prep'] = newTable('prep')
         tt['prep'].program = ttProgram.Program()
-        tt['prep'].program.fromBytecode(b'\xb8\x01\xff\x85\xb0\x04\x8d')  # PUSHW 511 SCANCTRL, PUSHB 4 SCANTYPE
+        tt['prep'].program.fromBytecode(b'\xb8\x01\xff\x85\xb0\x04\x8d')
         tt['maxp'].maxStackElements = max(tt['maxp'].maxStackElements, 1)
 
 
@@ -331,20 +340,20 @@ ZIP_README = '''
   ....................................................................
   Josh Puckett  ·  joshpuckett.me  ·  github.com/joshpuckett/allo
   SIL Open Font License 1.1
-'''  # (the ZIP's README.txt; approved 2026-11-14 from build/release-checks/README-spec.txt. 72 columns at most)
+'''
 
 
 def main():
     ds = DesignSpaceDocument.fromfile(ROOT / 'sources/Allo.designspace')
     ds.loadSourceFonts(ufoLib2.Font.open)
-    for instance in ds.instances:  # (their own names: else varLib names them from the STAT labels, "Display" for Display Regular)
+    for instance in ds.instances:
         instance.localisedStyleName = {'en': instance.styleName, **instance.localisedStyleName}
     statics = {path.stem: ufoLib2.Font.open(path) for path in sorted((ROOT / 'sources/static').glob('*.ufo'))}
     default = ds.findDefault().font.info
     win = (default.openTypeOS2WinAscent, default.openTypeOS2WinDescent)
     assert all((f.info.openTypeOS2WinAscent, f.info.openTypeOS2WinDescent) == win for f in [s.font for s in ds.sources] + list(statics.values())), 'Windows metrics differ between sources'
     check_win([s.font for s in ds.sources] + list(statics.values()), win)
-    variable = compileVariableTTF(ds, useProductionNames=False, flattenComponents=True)  # (no composite points at another)
+    variable = compileVariableTTF(ds, useProductionNames=False, flattenComponents=True)
     if CONFIG.get('smallShift'):
         exact_small(variable, CONFIG['smallShift'])
     drop_unreachable(variable)
@@ -358,15 +367,15 @@ def main():
         otf = compileOTF(ufo, removeOverlaps=False, useProductionNames=False)
         drop_unreachable(otf)
         otf.save(otfs[stem])
-    hint_otfs({w: (otfs[f'Allo-{w}'], otfs['Allo-' + ('' if w == 'Regular' else w) + 'Oblique']) for w in WEIGHT_NAMES})  # (all nine: until 2026-11-14 only the first three statics were hinted)
+    hint_otfs({w: (otfs[f'Allo-{w}'], otfs['Allo-' + ('' if w == 'Regular' else w) + 'Oblique']) for w in WEIGHT_NAMES})
     for path in otfs.values():
-        files += save(TTFont(path), path)  # (and its woff2)
+        files += save(TTFont(path), path)
     hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
     (ROOT / 'fonts/SHA256SUMS').write_text(''.join(f'{digest}  {name}\n' for name, digest in sorted(hashes.items())))
     files += [ROOT / 'fonts/SHA256SUMS', ROOT / 'OFL.txt']
     archive = ROOT / f"Allo-{CONFIG['version']}.zip"
     date = time.gmtime(int(os.environ['SOURCE_DATE_EPOCH']))[:6]
-    entries = {str(path.relative_to(ROOT)): path.read_bytes() for path in files if path.name != 'SHA256SUMS'}  # (checksums stay in the repo; GitHub shows each release file's own: Josh, 2026-11-14)
+    entries = {str(path.relative_to(ROOT)): path.read_bytes() for path in files if path.name != 'SHA256SUMS'}
     entries['README.txt'] = ZIP_README.replace('{version}', CONFIG['version']).encode()
     with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as z:
         for name, data in sorted(entries.items()):

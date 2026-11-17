@@ -5,6 +5,6 @@
   <anchor x="597" y="1562" name="raccent"/>
   <outline>
     <component base="t"/>
-    <component base="cedillacomb" xOffset="138.0"/>
+    <component base="cedillacomb" xOffset="138"/>
   </outline>
 </glyph>

@@ -8,6 +8,6 @@
   <anchor x="572" y="1118" name="top"/>
   <outline>
     <component base="s"/>
-    <component base="cedillacomb" xOffset="254.0"/>
+    <component base="cedillacomb" xOffset="254"/>
   </outline>
 </glyph>

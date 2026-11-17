@@ -10,6 +10,6 @@
   <anchor x="228" y="1490" name="top"/>
   <outline>
     <component base="l"/>
-    <component base="slashshort.lc" xOffset="2"/>
+    <component base="slashshort.lc" xOffset="2" yOffset="23"/>
   </outline>
 </glyph>

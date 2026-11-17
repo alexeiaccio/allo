@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="oe" format="2">
-  <advance width="2012"/>
+  <advance width="2016"/>
   <unicode hex="0153"/>
   <anchor x="1441" y="0" name="bottom"/>
   <anchor x="600" y="559" name="center"/>
@@ -10,6 +10,6 @@
   <anchor x="1443" y="0" name="cedilla"/>
   <outline>
     <component base="o"/>
-    <component base="e" xOffset="853"/>
+    <component base="e" xOffset="857"/>
   </outline>
 </glyph>
