@@ -2,7 +2,6 @@
 <glyph name="cedillacomb" format="2">
   <outline>
     <contour>
-      <point x="237.75" y="-445.459946969697" type="line"/>
       <point x="237.75" y="-504.1194112224338"/>
       <point x="266.1305887775662" y="-532.5"/>
       <point x="324.790053030303" y="-532.5" type="curve"/>
@@ -34,6 +33,7 @@
       <point x="266.1305887775662" y="-355.0"/>
       <point x="237.75" y="-383.3805887775662"/>
       <point x="237.75" y="-442.040053030303" type="curve"/>
+      <point x="237.75" y="-445.459946969697" type="line"/>
     </contour>
   </outline>
 </glyph>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Ycircumflex" format="2">
-  <advance width="1390"/>
+  <advance width="1269"/>
   <unicode hex="0176"/>
   <anchor x="697" y="0" name="bottom"/>
   <anchor x="700" y="363" name="cross"/>
@@ -9,6 +9,6 @@
   <anchor x="698" y="1936" name="top"/>
   <outline>
     <component base="Y"/>
-    <component base="circumflexcomb" xOffset="274" yOffset="393"/>
+    <component base="circumflexcomb" xOffset="213" yOffset="393"/>
   </outline>
 </glyph>

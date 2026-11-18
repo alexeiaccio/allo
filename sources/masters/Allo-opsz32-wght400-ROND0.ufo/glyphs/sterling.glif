@@ -22,17 +22,8 @@
       <point x="977" y="158"/>
       <point x="935" y="158" type="qcurve"/>
       <point x="500" y="158" type="line"/>
-      <point x="500" y="158"/>
-      <point x="500" y="158"/>
-      <point x="500" y="158" type="qcurve"/>
-      <point x="500" y="158"/>
-      <point x="500" y="158"/>
-      <point x="500" y="158" type="qcurve"/>
-      <point x="504" y="162"/>
-      <point x="510" y="171"/>
-      <point x="512" y="176" type="qcurve"/>
-      <point x="522" y="195"/>
-      <point x="519" y="247"/>
+      <point x="520" y="178"/>
+      <point x="520" y="239"/>
       <point x="514" y="281" type="qcurve"/>
       <point x="512" y="299"/>
       <point x="507" y="341"/>

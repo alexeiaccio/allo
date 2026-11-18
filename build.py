@@ -295,8 +295,8 @@ ZIP_README = '''
     Letter-spacing turns ligatures off in most browsers.
 
 
-  CHARACTERS  (576)
-    Latin        249 letters: A–Z a–z, accented forms, ẞ ß Æ æ Œ œ
+  CHARACTERS  ({characters})
+    Latin        A–Z a–z, accented forms, Vietnamese, ẞ ß Æ æ Œ œ
     Figures      0–9  ⁰¹²³⁴⁵⁶⁷⁸⁹  ₀₁₂₃₄₅₆₇₈₉  ½ ⅓ ¼ ⅔ ¾ ⅛ ⅜ ⅝ ⅞
     Punctuation  ! ? ¡ ¿ … · • † ‡ § ¶ ‘ ’ “ ” « » ‹ › ‐ – — ‒
     Currency     $ ¢ £ ¥ € ₹ ₩ ₽ ₺ ₪ ฿ ₫ ₴ ₦ ₱ ₿ ƒ
@@ -376,7 +376,7 @@ def main():
     archive = ROOT / f"Allo-{CONFIG['version']}.zip"
     date = time.gmtime(int(os.environ['SOURCE_DATE_EPOCH']))[:6]
     entries = {str(path.relative_to(ROOT)): path.read_bytes() for path in files if path.name != 'SHA256SUMS'}
-    entries['README.txt'] = ZIP_README.replace('{version}', CONFIG['version']).encode()
+    entries['README.txt'] = ZIP_README.replace('{version}', CONFIG['version']).replace('{characters}', str(len(variable.getBestCmap()))).encode()
     with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as z:
         for name, data in sorted(entries.items()):
             info = zipfile.ZipInfo('Allo-' + CONFIG['version'] + '/' + name, date)

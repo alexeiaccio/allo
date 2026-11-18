@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Ydotbelow" format="2">
-  <advance width="1395"/>
+  <advance width="1321"/>
   <unicode hex="1EF4"/>
   <anchor x="697" y="0" name="bottom"/>
   <anchor x="700" y="363" name="cross"/>
@@ -9,6 +9,6 @@
   <anchor x="695" y="1490" name="top"/>
   <outline>
     <component base="Y"/>
-    <component base="dotbelow" xOffset="447"/>
+    <component base="dotbelow" xOffset="410"/>
   </outline>
 </glyph>

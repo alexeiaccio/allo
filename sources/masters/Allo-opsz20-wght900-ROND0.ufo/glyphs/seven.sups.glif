@@ -28,9 +28,7 @@
       <point x="163.00227347657975" y="1549.0"/>
       <point x="163.0087" y="1549.0" type="curve"/>
       <point x="543.0" y="1549.0" type="line"/>
-      <point x="543.0" y="1548.0"/>
-      <point x="543.0" y="1547.0"/>
-      <point x="543.0" y="1546.0" type="curve"/>
+      <point x="543.0" y="1546.0" type="line"/>
       <point x="219.00631969818306" y="900.0126003858835" type="line"/>
     </contour>
   </outline>

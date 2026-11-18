@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="K" format="2">
-  <advance width="1198"/>
+  <advance width="1192"/>
   <unicode hex="004B"/>
   <anchor x="649" y="0" name="bottom"/>
   <anchor x="649" y="1490" name="top"/>
@@ -33,10 +33,7 @@
       <point x="1229.238483888599" y="1490.0"/>
       <point x="1226.0980100454608" y="1488.8452120002335"/>
       <point x="1217.5146251009696" y="1481.5458341581868" type="curve" smooth="yes"/>
-      <point x="294.1200554788861" y="696.2838536511333" type="line" smooth="yes"/>
-      <point x="291.2649335355413" y="693.8558355691798"/>
-      <point x="288.5963512092131" y="695.3540448061225"/>
-      <point x="289.1826569043705" y="699.05583339402" type="curve" smooth="yes"/>
+      <point x="287.90673828125" y="691.0" type="line"/>
       <point x="411.46808458183546" y="1471.1356620251725" type="line" smooth="yes"/>
       <point x="413.5660212413992" y="1484.3815132059628"/>
       <point x="408.7673801653474" y="1490.0"/>

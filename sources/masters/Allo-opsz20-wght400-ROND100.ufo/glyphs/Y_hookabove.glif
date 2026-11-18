@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Yhookabove" format="2">
-  <advance width="1322"/>
+  <advance width="1248"/>
   <unicode hex="1EF6"/>
   <anchor x="661" y="0" name="bottom"/>
   <anchor x="664" y="389" name="cross"/>
@@ -9,6 +9,6 @@
   <anchor x="661" y="1490" name="top"/>
   <outline>
     <component base="Y"/>
-    <component base="hookabovecomb" xOffset="412" yOffset="393"/>
+    <component base="hookabovecomb" xOffset="375" yOffset="393"/>
   </outline>
 </glyph>

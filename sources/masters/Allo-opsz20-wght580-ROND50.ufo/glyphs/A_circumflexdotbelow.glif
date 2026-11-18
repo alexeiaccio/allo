@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Acircumflexdotbelow" format="2">
-  <advance width="1428"/>
+  <advance width="1387"/>
   <unicode hex="1EAC"/>
   <anchor x="713" y="0" name="bottom"/>
   <anchor x="1403" y="0" name="ogonek"/>
@@ -8,7 +8,7 @@
   <anchor x="714" y="1936" name="top"/>
   <outline>
     <component base="A"/>
-    <component base="circumflexcomb" xOffset="290" yOffset="393"/>
-    <component base="dotbelow" xOffset="461"/>
+    <component base="circumflexcomb" xOffset="270" yOffset="393"/>
+    <component base="dotbelow" xOffset="441"/>
   </outline>
 </glyph>

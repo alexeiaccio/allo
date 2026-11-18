@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="K" format="2">
-  <advance width="1315"/>
+  <advance width="1263"/>
   <unicode hex="004B"/>
   <anchor x="673" y="0" name="bottom"/>
   <anchor x="673" y="1490" name="top"/>
@@ -15,9 +15,6 @@
       <point x="340.0" y="92.0" type="curve"/>
       <point x="340.0" y="494.0" type="line"/>
       <point x="504.0" y="668.0" type="line"/>
-      <point x="504.0" y="668.0"/>
-      <point x="504.0" y="668.0"/>
-      <point x="504.0" y="668.0" type="curve"/>
       <point x="1024.312769830285" y="32.5906211213337" type="line"/>
       <point x="1041.2048205059655" y="11.96193766364734"/>
       <point x="1066.460708068822" y="0.0"/>
@@ -35,10 +32,7 @@
       <point x="1051.816923737215" y="1490.0"/>
       <point x="1028.4921964555717" y="1479.9745796436973"/>
       <point x="1011.7041853300753" y="1462.2726080271282" type="curve"/>
-      <point x="383.4036345550317" y="799.7665831411223" type="line"/>
-      <point x="362.4821489990093" y="777.7061055347721"/>
-      <point x="340.0" y="786.6714931284049"/>
-      <point x="340.0" y="817.075" type="curve"/>
+      <point x="340.0" y="754.0" type="line"/>
       <point x="340.0" y="1398.0" type="line"/>
       <point x="340.0" y="1448.810196984433"/>
       <point x="298.810196984433" y="1490.0"/>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Yacute" format="2">
-  <advance width="1322"/>
+  <advance width="1278"/>
   <unicode hex="00DD"/>
   <anchor x="661" y="0" name="bottom"/>
   <anchor x="664" y="389" name="cross"/>
@@ -9,6 +9,6 @@
   <anchor x="664" y="1928" name="top"/>
   <outline>
     <component base="Y"/>
-    <component base="acutecomb" xOffset="459" yOffset="393"/>
+    <component base="acutecomb" xOffset="437" yOffset="393"/>
   </outline>
 </glyph>

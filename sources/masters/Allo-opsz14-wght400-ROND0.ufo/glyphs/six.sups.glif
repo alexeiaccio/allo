@@ -13,9 +13,7 @@
       <point x="475.0" y="1448.0"/>
       <point x="385.0" y="1397.0"/>
       <point x="350.0" y="1332.0" type="curve"/>
-      <point x="348.0" y="1332.0"/>
-      <point x="346.0" y="1332.0"/>
-      <point x="344.0" y="1332.0" type="curve"/>
+      <point x="344.0" y="1332.0" type="line"/>
       <point x="344.0" y="1489.0"/>
       <point x="420.0" y="1610.0"/>
       <point x="519.0" y="1610.0" type="curve"/>

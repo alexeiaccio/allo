@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Abreve" format="2">
-  <advance width="1365"/>
+  <advance width="1386"/>
   <unicode hex="0102"/>
   <anchor x="685" y="0" name="bottom"/>
   <anchor x="1372" y="0" name="ogonek"/>
@@ -8,6 +8,6 @@
   <anchor x="685" y="1930" name="top"/>
   <outline>
     <component base="A"/>
-    <component base="brevecomb" xOffset="280" yOffset="434"/>
+    <component base="brevecomb" xOffset="290" yOffset="434"/>
   </outline>
 </glyph>

@@ -30,9 +30,7 @@
       <point x="58.00378912763297" y="1266.0"/>
       <point x="58.0145" y="1266.0" type="curve"/>
       <point x="789.0" y="1266.0" type="line"/>
-      <point x="789.0" y="1264.0"/>
-      <point x="789.0" y="1262.0"/>
-      <point x="789.0" y="1260.0" type="curve"/>
+      <point x="789.0" y="1260.0" type="line"/>
       <point x="159.01049229856739" y="0.020984597134749382" type="line"/>
     </contour>
   </outline>

@@ -42,12 +42,9 @@
       <point x="933" y="957"/>
       <point x="765" y="1059"/>
       <point x="659" y="1059" type="qcurve"/>
-      <point x="568.6" y="1059"/>
-      <point x="413.6" y="976.9999999999999"/>
-      <point x="355.8" y="905.9999999999999" type="qcurve"/>
-      <point x="350.8" y="900.4"/>
-      <point x="340" y="903"/>
-      <point x="340" y="912" type="qcurve"/>
+      <point x="562" y="1059"/>
+      <point x="398" y="965"/>
+      <point x="340" y="885" type="qcurve"/>
       <point x="341.40000000000003" y="981" type="line"/>
       <point x="341" y="1011"/>
       <point x="317" y="1035"/>

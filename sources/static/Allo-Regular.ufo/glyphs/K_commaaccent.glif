@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Kcommaaccent" format="2">
-  <advance width="1349"/>
+  <advance width="1317"/>
   <unicode hex="0136"/>
   <anchor x="690" y="0" name="bottom"/>
   <anchor x="690" y="1490" name="top"/>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Amacron" format="2">
-  <advance width="1428"/>
+  <advance width="1359"/>
   <unicode hex="0100"/>
   <anchor x="713" y="0" name="bottom"/>
   <anchor x="1403" y="0" name="ogonek"/>
@@ -8,6 +8,6 @@
   <anchor x="714" y="1871" name="top"/>
   <outline>
     <component base="A"/>
-    <component base="macroncomb" xOffset="287" yOffset="393"/>
+    <component base="macroncomb" xOffset="253" yOffset="393"/>
   </outline>
 </glyph>

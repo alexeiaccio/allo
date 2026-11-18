@@ -1037,7 +1037,7 @@
       <key>public.kern2.w</key>
       <integer>-185</integer>
       <key>public.kern2.x</key>
-      <integer>-137</integer>
+      <integer>-149</integer>
       <key>public.kern2.z</key>
       <integer>-166</integer>
       <key>slash</key>
@@ -2866,7 +2866,7 @@
     <key>public.kern1.x</key>
     <dict>
       <key>public.kern2.T</key>
-      <integer>-85</integer>
+      <integer>-97</integer>
       <key>public.kern2.a</key>
       <integer>-19</integer>
       <key>public.kern2.approxequal</key>

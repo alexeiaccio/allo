@@ -43,12 +43,9 @@
       <point x="943" y="1030"/>
       <point x="773" y="1132"/>
       <point x="663" y="1132" type="qcurve"/>
-      <point x="563" y="1132"/>
-      <point x="390" y="1038"/>
-      <point x="335" y="944" type="qcurve"/>
-      <point x="331" y="937"/>
-      <point x="320" y="940"/>
-      <point x="320" y="948" type="qcurve"/>
+      <point x="556" y="1132"/>
+      <point x="373" y="1024"/>
+      <point x="320" y="916" type="qcurve"/>
       <point x="319" y="1054" type="line"/>
       <point x="319" y="1089"/>
       <point x="290" y="1118"/>

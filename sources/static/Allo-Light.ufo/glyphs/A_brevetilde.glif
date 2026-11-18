@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Abrevetilde" format="2">
-  <advance width="1348"/>
+  <advance width="1332"/>
   <unicode hex="1EB4"/>
   <anchor x="674" y="0" name="bottom"/>
   <anchor x="1300" y="0" name="ogonek"/>
@@ -8,6 +8,6 @@
   <anchor x="674" y="2210" name="top"/>
   <outline>
     <component base="A"/>
-    <component base="brevetildecomb.cn" xOffset="313" yOffset="372"/>
+    <component base="brevetildecomb.cn" xOffset="305" yOffset="372"/>
   </outline>
 </glyph>

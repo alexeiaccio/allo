@@ -8,12 +8,9 @@
   <outline>
     <contour>
       <point x="402.0" y="-18.0" type="curve" smooth="yes"/>
-      <point x="525.5210713651686" y="-18.0"/>
-      <point x="654.1927110896348" y="37.18466099247356"/>
-      <point x="722.3748526302271" y="158.91476372527728" type="curve" smooth="yes"/>
-      <point x="732.5533184188826" y="177.08705427114845"/>
-      <point x="751.0" y="173.69116557162"/>
-      <point x="751.0" y="152.8625" type="curve" smooth="yes"/>
+      <point x="546.0" y="-18.0"/>
+      <point x="697.0" y="57.0"/>
+      <point x="751.0" y="225.0" type="curve"/>
       <point x="751.0" y="16.0" type="line"/>
       <point x="687.0" y="-33.0"/>
       <point x="623.0" y="-117.0"/>

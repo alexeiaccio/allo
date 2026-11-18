@@ -36,9 +36,7 @@
       <point x="834.0" y="1236.9855" type="curve"/>
       <point x="834.0" y="396.0" type="line"/>
       <point x="225.0" y="396.0" type="line"/>
-      <point x="225.0" y="398.0"/>
-      <point x="225.0" y="400.0"/>
-      <point x="225.0" y="402.0" type="curve"/>
+      <point x="225.0" y="396.0" type="line"/>
       <point x="225.0" y="402.0" type="line"/>
       <point x="888.9865407802018" y="1489.977946338644" type="line"/>
       <point x="888.9944278395265" y="1489.990869712959"/>

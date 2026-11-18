@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Agrave" format="2">
-  <advance width="1242"/>
+  <advance width="1238"/>
   <unicode hex="00C0"/>
   <anchor x="621" y="0" name="bottom"/>
   <anchor x="1204" y="0" name="ogonek"/>
@@ -8,6 +8,6 @@
   <anchor x="618" y="1928" name="top"/>
   <outline>
     <component base="A"/>
-    <component base="gravecomb" xOffset="286" yOffset="393"/>
+    <component base="gravecomb" xOffset="284" yOffset="393"/>
   </outline>
 </glyph>

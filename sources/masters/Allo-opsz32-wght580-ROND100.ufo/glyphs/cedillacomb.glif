@@ -4,7 +4,6 @@
   <anchor x="290" y="0" name="_cedilla"/>
   <outline>
     <contour>
-      <point x="168.0" y="-359.5" type="line"/>
       <point x="168.0" y="-391.8086578651014"/>
       <point x="194.19134213489858" y="-418.0"/>
       <point x="226.5" y="-418.0" type="curve"/>
@@ -36,6 +35,7 @@
       <point x="194.19134213489858" y="-301.0"/>
       <point x="168.0" y="-327.1913421348986"/>
       <point x="168.0" y="-359.5" type="curve"/>
+      <point x="168.0" y="-359.5" type="line"/>
     </contour>
   </outline>
 </glyph>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Ygrave" format="2">
-  <advance width="1390"/>
+  <advance width="1316"/>
   <unicode hex="1EF2"/>
   <anchor x="697" y="0" name="bottom"/>
   <anchor x="700" y="363" name="cross"/>
@@ -9,6 +9,6 @@
   <anchor x="698" y="1936" name="top"/>
   <outline>
     <component base="Y"/>
-    <component base="gravecomb" xOffset="286" yOffset="393"/>
+    <component base="gravecomb" xOffset="249" yOffset="393"/>
   </outline>
 </glyph>

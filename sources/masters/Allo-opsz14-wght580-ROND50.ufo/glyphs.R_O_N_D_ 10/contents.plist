@@ -4,8 +4,6 @@
   <dict>
     <key>Aogonek</key>
     <string>A_ogonek.glif</string>
-    <key>B</key>
-    <string>B_.glif</string>
     <key>C</key>
     <string>C_.glif</string>
     <key>Eng</key>
@@ -18,8 +16,6 @@
     <string>I_ogonek.glif</string>
     <key>Iogonek.1</key>
     <string>I_ogonek.1.glif</string>
-    <key>Ohorn</key>
-    <string>O_horn.glif</string>
     <key>S</key>
     <string>S_.glif</string>
     <key>Uogonek</key>
@@ -30,8 +26,6 @@
     <string>_part.f_base.glif</string>
     <key>a</key>
     <string>a.glif</string>
-    <key>a.1</key>
-    <string>a.1.glif</string>
     <key>a.sups</key>
     <string>a.sups.glif</string>
     <key>ae</key>
@@ -50,12 +44,6 @@
     <string>asciitilde.glif</string>
     <key>at</key>
     <string>at.glif</string>
-    <key>b</key>
-    <string>b.glif</string>
-    <key>baht</key>
-    <string>baht.glif</string>
-    <key>bitcoin</key>
-    <string>bitcoin.glif</string>
     <key>braceleft</key>
     <string>braceleft.glif</string>
     <key>braceright</key>
@@ -100,26 +88,16 @@
     <string>commaaccentrotate.cn.glif</string>
     <key>copyright</key>
     <string>copyright.glif</string>
-    <key>d</key>
-    <string>d.glif</string>
     <key>dollar</key>
     <string>dollar.glif</string>
-    <key>dong</key>
-    <string>dong.glif</string>
     <key>e</key>
     <string>e.glif</string>
     <key>e.sups</key>
     <string>e.sups.glif</string>
-    <key>eight</key>
-    <string>eight.glif</string>
-    <key>eight.sups</key>
-    <string>eight.sups.glif</string>
     <key>eng</key>
     <string>eng.glif</string>
     <key>eogonek</key>
     <string>eogonek.glif</string>
-    <key>eth</key>
-    <string>eth.glif</string>
     <key>euro</key>
     <string>euro.glif</string>
     <key>f</key>
@@ -152,8 +130,6 @@
     <string>g.glif</string>
     <key>germandbls</key>
     <string>germandbls.glif</string>
-    <key>h</key>
-    <string>h.glif</string>
     <key>horncomb</key>
     <string>horncomb.glif</string>
     <key>hryvnia</key>
@@ -162,20 +138,12 @@
     <string>iogonek.glif</string>
     <key>jdotless</key>
     <string>jdotless.glif</string>
-    <key>k</key>
-    <string>k.glif</string>
     <key>l.ss02</key>
     <string>l.ss02.glif</string>
-    <key>leftArrow</key>
-    <string>leftA_rrow.glif</string>
     <key>leftHookArrow</key>
     <string>leftH_ookA_rrow.glif</string>
-    <key>m</key>
-    <string>m.glif</string>
     <key>micro</key>
     <string>micro.glif</string>
-    <key>n</key>
-    <string>n.glif</string>
     <key>nine</key>
     <string>nine.glif</string>
     <key>nine.sups</key>
@@ -190,18 +158,10 @@
     <string>ogonek.e.glif</string>
     <key>ogonekcomb</key>
     <string>ogonekcomb.glif</string>
-    <key>ohorn</key>
-    <string>ohorn.glif</string>
     <key>ohorntilde</key>
     <string>ohorntilde.glif</string>
-    <key>one.foot</key>
-    <string>one.foot.glif</string>
     <key>ordfeminine</key>
     <string>ordfeminine.glif</string>
-    <key>p</key>
-    <string>p.glif</string>
-    <key>q</key>
-    <string>q.glif</string>
     <key>question</key>
     <string>question.glif</string>
     <key>questiondown</key>
@@ -212,8 +172,6 @@
     <string>quoteright.glif</string>
     <key>r</key>
     <string>r.glif</string>
-    <key>rightArrow</key>
-    <string>rightA_rrow.glif</string>
     <key>s</key>
     <string>s.glif</string>
     <key>s.sups</key>
@@ -242,8 +200,6 @@
     <string>t_t_t.glif</string>
     <key>tbar</key>
     <string>tbar.glif</string>
-    <key>thorn</key>
-    <string>thorn.glif</string>
     <key>three</key>
     <string>three.glif</string>
     <key>three.sups</key>
@@ -254,12 +210,6 @@
     <string>two.glif</string>
     <key>two.sups</key>
     <string>two.sups.glif</string>
-    <key>u</key>
-    <string>u.glif</string>
-    <key>u.sups</key>
-    <string>u.sups.glif</string>
-    <key>uhorn</key>
-    <string>uhorn.glif</string>
     <key>uni012F.ccmp</key>
     <string>uni012F_.ccmp.glif</string>
     <key>uni20B9</key>
