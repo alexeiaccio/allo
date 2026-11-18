@@ -716,7 +716,7 @@
       <key>public.kern2.X</key>
       <integer>-139</integer>
       <key>public.kern2.Y</key>
-      <integer>-103</integer>
+      <integer>-102</integer>
       <key>public.kern2.comma</key>
       <integer>-89</integer>
       <key>public.kern2.emdash</key>
@@ -897,7 +897,7 @@
       <key>public.kern2.T</key>
       <integer>1</integer>
       <key>public.kern2.Y</key>
-      <integer>-44</integer>
+      <integer>-42</integer>
       <key>public.kern2.comma</key>
       <integer>-68</integer>
       <key>public.kern2.i</key>
@@ -1054,7 +1054,7 @@
       <key>public.kern2.T</key>
       <integer>-80</integer>
       <key>public.kern2.a</key>
-      <integer>-115</integer>
+      <integer>-78</integer>
       <key>public.kern2.approxequal</key>
       <integer>-103</integer>
       <key>public.kern2.bullet</key>
@@ -1678,7 +1678,7 @@
       <key>public.kern2.v</key>
       <integer>29</integer>
       <key>public.kern2.x</key>
-      <integer>-30</integer>
+      <integer>-25</integer>
     </dict>
     <key>public.kern1.longs</key>
     <dict>
@@ -2398,7 +2398,7 @@
       <key>public.kern2.T</key>
       <integer>14</integer>
       <key>public.kern2.Y</key>
-      <integer>-87</integer>
+      <integer>-55</integer>
       <key>public.kern2.dagger</key>
       <integer>14</integer>
       <key>public.kern2.f</key>

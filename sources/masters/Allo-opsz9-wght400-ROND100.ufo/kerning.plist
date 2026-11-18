@@ -1807,7 +1807,7 @@
       <key>public.kern2.X</key>
       <integer>-57</integer>
       <key>public.kern2.Y</key>
-      <integer>-172</integer>
+      <integer>-138</integer>
       <key>public.kern2.a</key>
       <integer>20</integer>
       <key>public.kern2.dagger</key>
@@ -2345,7 +2345,7 @@
       <key>public.kern2.W</key>
       <integer>11</integer>
       <key>public.kern2.Y</key>
-      <integer>-115</integer>
+      <integer>-114</integer>
       <key>public.kern2.asciicircum</key>
       <integer>1</integer>
       <key>public.kern2.dagger</key>

@@ -1253,7 +1253,7 @@
       <key>public.kern2.S</key>
       <integer>-44</integer>
       <key>public.kern2.a</key>
-      <integer>-115</integer>
+      <integer>-27</integer>
       <key>public.kern2.approxequal</key>
       <integer>-103</integer>
       <key>public.kern2.bullet</key>
@@ -1286,7 +1286,7 @@
       <key>atilde</key>
       <integer>-133</integer>
       <key>edieresis</key>
-      <integer>-203</integer>
+      <integer>-182</integer>
       <key>ellipsis</key>
       <integer>-195</integer>
       <key>iacute</key>
@@ -1306,7 +1306,7 @@
       <key>multiply</key>
       <integer>-92</integer>
       <key>odieresis</key>
-      <integer>-211</integer>
+      <integer>-198</integer>
       <key>omacron</key>
       <integer>-115</integer>
       <key>periodcentered</key>
@@ -1935,7 +1935,7 @@
       <key>public.kern2.v</key>
       <integer>10</integer>
       <key>public.kern2.x</key>
-      <integer>-30</integer>
+      <integer>-28</integer>
     </dict>
     <key>public.kern1.longs</key>
     <dict>
@@ -2135,7 +2135,7 @@
       <key>public.kern2.X</key>
       <integer>-57</integer>
       <key>public.kern2.Y</key>
-      <integer>-163</integer>
+      <integer>-95</integer>
       <key>public.kern2.a</key>
       <integer>14</integer>
       <key>public.kern2.bullet</key>
@@ -2735,7 +2735,7 @@
       <key>public.kern2.W</key>
       <integer>9</integer>
       <key>public.kern2.Y</key>
-      <integer>-112</integer>
+      <integer>-91</integer>
       <key>public.kern2.asciicircum</key>
       <integer>5</integer>
       <key>public.kern2.dagger</key>

@@ -1097,7 +1097,7 @@
       <key>public.kern2.S</key>
       <integer>-30</integer>
       <key>public.kern2.a</key>
-      <integer>-115</integer>
+      <integer>-56</integer>
       <key>public.kern2.approxequal</key>
       <integer>-103</integer>
       <key>public.kern2.bullet</key>
@@ -1154,7 +1154,7 @@
       <key>public.kern2.J</key>
       <integer>-68</integer>
       <key>public.kern2.Y</key>
-      <integer>-30</integer>
+      <integer>-27</integer>
       <key>public.kern2.a</key>
       <integer>-198</integer>
       <key>public.kern2.approxequal</key>
@@ -1723,7 +1723,7 @@
       <key>public.kern2.t</key>
       <integer>-10</integer>
       <key>public.kern2.x</key>
-      <integer>-30</integer>
+      <integer>-28</integer>
     </dict>
     <key>public.kern1.longs</key>
     <dict>
@@ -1900,7 +1900,7 @@
       <key>public.kern2.X</key>
       <integer>-57</integer>
       <key>public.kern2.Y</key>
-      <integer>-193</integer>
+      <integer>-146</integer>
       <key>public.kern2.a</key>
       <integer>10</integer>
       <key>public.kern2.dagger</key>

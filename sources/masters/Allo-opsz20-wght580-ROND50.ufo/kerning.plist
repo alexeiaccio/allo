@@ -1277,7 +1277,7 @@
       <key>public.kern2.T</key>
       <integer>-53</integer>
       <key>public.kern2.a</key>
-      <integer>-115</integer>
+      <integer>-91</integer>
       <key>public.kern2.approxequal</key>
       <integer>-103</integer>
       <key>public.kern2.bullet</key>
@@ -2189,7 +2189,7 @@
       <key>public.kern2.X</key>
       <integer>-57</integer>
       <key>public.kern2.Y</key>
-      <integer>-138</integer>
+      <integer>-92</integer>
       <key>public.kern2.Z</key>
       <integer>3</integer>
       <key>public.kern2.a</key>
@@ -2817,7 +2817,7 @@
       <key>public.kern2.W</key>
       <integer>8</integer>
       <key>public.kern2.Y</key>
-      <integer>-107</integer>
+      <integer>-92</integer>
       <key>public.kern2.asciicircum</key>
       <integer>2</integer>
       <key>public.kern2.dagger</key>

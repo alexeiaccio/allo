@@ -1087,9 +1087,9 @@
       <key>public.kern2.C</key>
       <integer>-89</integer>
       <key>public.kern2.T</key>
-      <integer>-80</integer>
+      <integer>-56</integer>
       <key>public.kern2.a</key>
-      <integer>-115</integer>
+      <integer>-39</integer>
       <key>public.kern2.approxequal</key>
       <integer>-103</integer>
       <key>public.kern2.bullet</key>
@@ -1144,7 +1144,7 @@
       <key>public.kern2.J</key>
       <integer>-68</integer>
       <key>public.kern2.Y</key>
-      <integer>-30</integer>
+      <integer>-21</integer>
       <key>public.kern2.a</key>
       <integer>-144</integer>
       <key>public.kern2.approxequal</key>

@@ -12,16 +12,16 @@
     <contour>
       <point x="640.0" y="-18.0"/>
       <point x="767.0" y="62.0"/>
-      <point x="813.0" y="175.0" type="curve"/>
-      <point x="813.0" y="175.0" type="line"/>
-      <point x="813.0" y="173.0" type="line"/>
-      <point x="813.0" y="77.45473827927273"/>
-      <point x="890.4547382792728" y="0.0"/>
-      <point x="986.0" y="0.0" type="curve"/>
-      <point x="1033.0" y="0.0" type="line"/>
-      <point x="1128.5452617207272" y="0.0"/>
-      <point x="1206.0" y="77.45473827927273"/>
-      <point x="1206.0" y="173.0" type="curve"/>
+      <point x="813.0" y="198.5" type="curve"/>
+      <point x="813.0" y="198.5" type="line"/>
+      <point x="813.0" y="196.5" type="line"/>
+      <point x="813.0" y="87.97604665824907"/>
+      <point x="900.9760466582491" y="0.0"/>
+      <point x="1009.5" y="0.0" type="curve"/>
+      <point x="1009.5" y="0.0" type="line"/>
+      <point x="1118.023953341751" y="0.0"/>
+      <point x="1206.0" y="87.97604665824907"/>
+      <point x="1206.0" y="196.5" type="curve"/>
       <point x="1206.0" y="1341.5" type="line"/>
       <point x="1206.0" y="1451.1285228414126"/>
       <point x="1117.1285228414126" y="1540.0"/>

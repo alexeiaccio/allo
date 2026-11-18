@@ -26,16 +26,16 @@
       <point x="182.09533478367212" y="1540.0"/>
       <point x="93.0" y="1450.9046652163279"/>
       <point x="93.0" y="1341.0" type="curve"/>
-      <point x="93.0" y="182.0" type="line"/>
-      <point x="93.0" y="81.48417553079557"/>
-      <point x="174.48417553079557" y="0.0"/>
-      <point x="275.0" y="0.0" type="curve"/>
-      <point x="305.0" y="0.0" type="line"/>
-      <point x="405.5158244692044" y="0.0"/>
-      <point x="487.0" y="81.48417553079557"/>
-      <point x="487.0" y="182.0" type="curve"/>
-      <point x="487.0" y="184.0" type="line"/>
-      <point x="487.0" y="184.0" type="line"/>
+      <point x="93.0" y="197.0" type="line"/>
+      <point x="93.0" y="88.19990428333367"/>
+      <point x="181.19990428333367" y="0.0"/>
+      <point x="290.0" y="0.0" type="curve"/>
+      <point x="290.0" y="0.0" type="line"/>
+      <point x="398.8000957166663" y="0.0"/>
+      <point x="487.0" y="88.19990428333367"/>
+      <point x="487.0" y="197.0" type="curve"/>
+      <point x="487.0" y="199.0" type="line"/>
+      <point x="487.0" y="199.0" type="line"/>
       <point x="534.0" y="72.0"/>
       <point x="667.0" y="-14.0"/>
       <point x="822.0" y="-14.0" type="curve"/>
