@@ -124,6 +124,17 @@ the sources as they are. Keep points compatible across masters.
 `sources/static` holds the 18 static fonts' sources: cut from the variable masters at opsz 14, ROND 50, then edited
 separately. The obliques are separate drawings, not a slant axis.
 
+## Contributing
+
+Found a problem, or missing a character? Please [open an issue](https://github.com/joshpuckett/allo/issues); a
+screenshot and the text you typed help a lot.
+
+Pull requests that change the masters or the font files aren't accepted for now. Every change to a letter gets
+reviewed by eye across all the weights and axes, and that's hard to do well for work that arrives from outside. If
+you have a larger idea, such as a new script, open an issue first so we can talk about it.
+
+You're free to modify Allo and ship your own version under the [license](OFL.txt).
+
 ## License
 
 [SIL Open Font License 1.1](OFL.txt): free to use, modify and redistribute, including commercially. The fonts can't
