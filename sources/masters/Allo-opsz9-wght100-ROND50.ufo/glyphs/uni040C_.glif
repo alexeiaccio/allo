@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="uni040C" format="2">
+  <advance width="1277"/>
+  <unicode hex="040C"/>
+  <outline>
+    <contour>
+      <point x="233.07978723404253" y="0.0" type="line"/>
+      <point x="233.07978723404253" y="1490.0" type="line"/>
+      <point x="279.2938829787234" y="1490.0" type="line"/>
+      <point x="279.2938829787234" y="785.0" type="line"/>
+      <point x="556.5784574468084" y="785.0" type="line"/>
+      <point x="1129.2313829787233" y="1490.0" type="line"/>
+      <point x="1187.501329787234" y="1490.0" type="line"/>
+      <point x="596.7646276595744" y="762.0" type="line"/>
+      <point x="1210.6083776595744" y="0.0" type="line"/>
+      <point x="1152.3384308510638" y="0.0" type="line"/>
+      <point x="556.5784574468084" y="739.0" type="line"/>
+      <point x="279.2938829787234" y="739.0" type="line"/>
+      <point x="279.2938829787234" y="0.0" type="line"/>
+    </contour>
+    <contour>
+      <point x="624.8949468085106" y="1655.0" type="line"/>
+      <point x="778.6070478723403" y="1929.0" type="line"/>
+      <point x="838.8863031914893" y="1929.0" type="line"/>
+      <point x="671.1090425531914" y="1655.0" type="line"/>
+    </contour>
+  </outline>
+</glyph>

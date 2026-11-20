@@ -159,8 +159,9 @@ SLAV = RU + [0x0400, 0x0402, 0x0403, 0x0404, 0x0405, 0x0406, 0x0407, 0x0408, 0x0
              0x040B, 0x040C, 0x040D, 0x040E, 0x040F, 0x0450, 0x0452, 0x0453, 0x0454, 0x0455,
              0x0456, 0x0457, 0x0458, 0x0459, 0x045A, 0x045B, 0x045C, 0x045D, 0x045E, 0x045F,
              0x0490, 0x0491]
-EXT = SLAV + [c for c in range(0x0400, 0x0530)
-              if c not in SLAV and c not in SAME_AS_LATIN and c not in MARKED]
+EXT = SLAV + [c for c in sorted(inter_at(400, 14).getBestCmap())
+              if 0x0400 <= c <= 0x052F and c not in SLAV
+              and c not in SAME_AS_LATIN and c not in MARKED]
 STAGES = {"ru": RU, "slav": SLAV, "ext": EXT}
 
 
@@ -305,17 +306,22 @@ def main():
         out.parent.mkdir(parents=True, exist_ok=True)
         print(preview(font, [cmap[ord(ch)] for ch in args.text], out, per_row=len(args.text), gap=0))
     if args.features:
+        import unicodedata
+        caps = [name_of(c) for c in chars if unicodedata.category(chr(c)) == "Lu"]
+        every = [name_of(c) for c in chars]
         for path in sorted(MASTERS.glob("*.ufo")):
             fea = path / "features.fea"
             text = fea.read_text()
-            if "languagesystem cyrl" in text:
-                continue
-            text = text.replace("languagesystem latn dflt;",
-                                "languagesystem latn dflt;\nlanguagesystem cyrl dflt;")
-            extra = " ".join(n for n in UPPER if n in font_names(path)) + " "
-            for cls in ("@CAPS = [", "@NOT_SPACE = [", "@NOT_BRACKET = ["):
+            if "languagesystem cyrl" not in text:
+                text = text.replace("languagesystem latn dflt;",
+                                    "languagesystem latn dflt;\nlanguagesystem cyrl dflt;")
+            for cls, names in (("@CAPS = [", caps), ("@NOT_SPACE = [", every), ("@NOT_BRACKET = [", every)):
                 i = text.index(cls) + len(cls)
-                text = text[:i] + extra + text[i:]
+                end = text.index("];", i)
+                have = set(text[i:end].split())
+                add = [n for n in names if n not in have]
+                if add:
+                    text = text[:end].rstrip() + " " + " ".join(add) + " " + text[end:]
             fea.write_text(text)
             print(f"{path.name}: features patched")
     if args.preview:

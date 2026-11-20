@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="uni0483" format="2">
+  <unicode hex="0483"/>
+  <outline>
+    <contour>
+      <point x="-266.6510702647536" y="1291.2045161300214" type="line"/>
+      <point x="-824.6678769874427" y="1291.2045161300214" type="line"/>
+      <point x="-824.6678769874427" y="1167.2016433919248" type="line"/>
+      <point x="-1006.1208945581074" y="1167.2016433919248" type="line"/>
+      <point x="-1004.1697868422937" y="1403.3975914644898" type="line"/>
+      <point x="-444.20187240379107" y="1403.3975914644898" type="line"/>
+      <point x="-448.1040878354182" y="1509.6857680971439" type="line"/>
+      <point x="-266.6510702647536" y="1509.6857680971439" type="line"/>
+    </contour>
+  </outline>
+</glyph>

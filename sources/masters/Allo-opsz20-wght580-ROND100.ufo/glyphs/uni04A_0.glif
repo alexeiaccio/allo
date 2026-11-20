@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="uni04A0" format="2">
+  <advance width="1714"/>
+  <unicode hex="04A0"/>
+  <outline>
+    <contour>
+      <point x="595.864934579489" y="1467.5698438630304" type="line"/>
+      <point x="595.864934579489" y="1254.2429125876436" type="line"/>
+      <point x="70.32084714605453" y="1254.2429125876436" type="line"/>
+      <point x="70.32084714605453" y="1467.5698438630304" type="line"/>
+    </contour>
+    <contour>
+      <point x="474.1691857430529" y="0.0" type="line"/>
+      <point x="474.1691857430529" y="1467.5698438630304" type="line"/>
+      <point x="727.0449909472719" y="1467.5698438630304" type="line"/>
+      <point x="727.0449909472719" y="855.8884097943227" type="line"/>
+      <point x="904.2238122446739" y="855.8884097943227" type="line"/>
+      <point x="1348.9971475918242" y="1467.5698438630304" type="line"/>
+      <point x="1648.8250185669735" y="1467.5698438630304" type="line"/>
+      <point x="1115.0222987063387" y="755.1622554229784" type="line"/>
+      <point x="1672.9485433342609" y="0.0" type="line"/>
+      <point x="1373.782314230787" y="0.0" type="line"/>
+      <point x="908.0463279320838" y="640.2867285059824" type="line"/>
+      <point x="727.0449909472719" y="640.2867285059824" type="line"/>
+      <point x="727.0449909472719" y="0.0" type="line"/>
+    </contour>
+  </outline>
+</glyph>
