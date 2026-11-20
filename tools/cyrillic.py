@@ -42,6 +42,11 @@ from ufoLib2.objects import Component, Contour, Point
 
 ROOT = Path(__file__).resolve().parent.parent
 MASTERS = ROOT / "sources/masters"
+STATICS = ROOT / "sources/static"
+
+# the statics are the variable font at Text size, Friendly
+STATIC_WEIGHTS = {"Thin": 100, "ExtraLight": 200, "Light": 300, "Regular": 400, "Medium": 500,
+                  "SemiBold": 600, "Bold": 700, "ExtraBold": 800, "Black": 900}
 # Inter 4.1's variable font. Fetch it with:
 #   curl -L https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip | tar -x -C build
 # or point ALLO_INTER at an InterVariable.ttf.
@@ -156,11 +161,52 @@ def _split(value):
     return out
 
 
+def sheared(contours, slant):
+    if not slant:
+        return contours
+    return [[(op, tuple((x + slant * y, y) for x, y in pts)) for op, pts in c] for c in contours]
+
+
 def fitted(contours, sx, sy, dx=0.0):
     return [[(op, tuple((x * sx + dx, y * sy) for x, y in pts)) for op, pts in c] for c in contours]
 
 
 # ---------------------------------------------------------------- this master
+
+def crossings(font, name, at):
+    """Where the line y = at crosses the glyph outline."""
+    from fontTools.misc.bezierTools import calcCubicParameters, solveCubic
+    pen = DecomposingRecordingPen(font)
+    font[name].draw(pen)
+    hits, start, last = [], None, None
+    for op, pts in pen.value:
+        if op == "moveTo":
+            start = last = pts[0]
+            continue
+        if op in ("closePath", "endPath"):
+            pts = (start,)
+        if op != "curveTo":
+            (x0, y0), (x1, y1) = last, pts[-1]
+            pts = ((x0 + (x1 - x0) / 3, y0 + (y1 - y0) / 3),
+                   (x0 + 2 * (x1 - x0) / 3, y0 + 2 * (y1 - y0) / 3), pts[-1])
+        a, b, c, d = calcCubicParameters(last, *pts)
+        for t in solveCubic(a[1], b[1], c[1], d[1] - at):
+            if 0 <= t < 1:
+                hits.append(((a[0] * t + b[0]) * t + c[0]) * t + d[0])
+        last = pts[-1]
+    return sorted(hits)
+
+
+def slant(font):
+    """Skew of an oblique master, measured on I's left edge; 0 for uprights.
+    Allo's obliques are slanted uprights, not a separate italic drawing, so the
+    Cyrillic is slanted by the same amount instead of coming from Inter's italic."""
+    if "Oblique" not in Path(font.path).name:
+        return 0.0
+    cap = font.info.capHeight
+    low, high = crossings(font, "I", 0.05 * cap)[0], crossings(font, "I", 0.95 * cap)[0]
+    return (high - low) / (0.9 * cap)
+
 
 def corner(font, name="H"):
     """(radius, k) of a drawn corner: how far it is cut off both edges, and
@@ -187,6 +233,7 @@ class Metrics:
     r_u: float
     r_l: float
     k: float
+    slant: float
     opsz: float
     wght: float
     rond: float
@@ -200,9 +247,18 @@ class Metrics:
         return self.font[name].width
 
     def mark(self, base, mark):
+        """Where a combining mark sits in a finished Latin glyph. The oblique
+        statics carry no components (their accents are drawn in), so their
+        offset comes from the upright variable master of the same weight,
+        slanted along with everything else."""
         for c in self.font[base].components:
             if c.baseGlyph == mark:
                 return c.transformation.dx, c.transformation.dy
+        nearest = min((100, 400, 580, 900), key=lambda w: abs(w - self.wght))
+        ref = ufoLib2.Font.open(MASTERS / f"Allo-opsz14-wght{nearest}-ROND50.ufo")
+        for c in ref[base].components:
+            if c.baseGlyph == mark:
+                return c.transformation.dx + self.slant * c.transformation.dy, c.transformation.dy
         raise LookupError(f"{base} has no {mark}")
 
 
@@ -212,9 +268,12 @@ def measure(font):
         for tag in ("opsz", "wght", "ROND"):
             if b.startswith(tag):
                 vals[tag] = float(b[len(tag):])
+    if "wght" not in vals:                   # static: named by style, Text size
+        style = Path(font.path).name.replace("Allo-", "").replace("Oblique", "").replace(".ufo", "")
+        vals = {"wght": STATIC_WEIGHTS[style or "Regular"], "opsz": 14, "ROND": 50}
     r_u, k = corner(font, "H")
     r_l, _ = corner(font, "n")
-    return Metrics(font, font.info.capHeight, font.info.xHeight, r_u, r_l, k,
+    return Metrics(font, font.info.capHeight, font.info.xHeight, r_u, r_l, k, slant(font),
                    vals["opsz"], vals["wght"], vals["ROND"])
 
 
@@ -262,8 +321,8 @@ def build(m, chars):
             todo.append(code)
     for code, (adv, contours, sx, sy) in copy_inter(m, todo).items():
         r = m.r_u if code < 0x0430 else m.r_l
-        g[name_of(code)] = (round(adv),
-                            round_all(fitted(contours, sx, sy), r, m.k, corner_masks(code)), [])
+        shape = sheared(fitted(contours, sx, sy), m.slant)
+        g[name_of(code)] = (round(adv), round_all(shape, r, m.k, corner_masks(code)), [])
     return g
 
 
@@ -371,6 +430,7 @@ def main():
     ap.add_argument("--weights", default="", help="comma list, e.g. 100,400,900")
     ap.add_argument("--text", default="", help="render this string instead of the alphabet")
     ap.add_argument("--features", action="store_true", help="add the cyrl languagesystem and classes")
+    ap.add_argument("--statics", action="store_true", help="work on sources/static instead of the masters")
     args = ap.parse_args()
     chars = STAGES[args.stage]
 
@@ -389,7 +449,7 @@ def main():
         import unicodedata
         caps = [name_of(c) for c in chars if unicodedata.category(chr(c)) == "Lu"]
         every = [name_of(c) for c in chars]
-        for path in sorted(MASTERS.glob("*.ufo")):
+        for path in sorted((STATICS if args.statics else MASTERS).glob("*.ufo")):
             fea = path / "features.fea"
             text = fea.read_text()
             if "languagesystem cyrl" not in text:
@@ -414,7 +474,8 @@ def main():
             print(preview(font, [n for n in UPPER if n in font], out))
             print(preview(font, [n for n in LOWER if n in font], out.with_name(out.stem + "-lower.png")))
     if args.write:
-        for path in sorted(MASTERS.glob("*.ufo")):
+        folder = STATICS if args.statics else MASTERS
+        for path in sorted(folder.glob("*.ufo")):
             font = ufoLib2.Font.open(path)
             if args.refresh:
                 for code in chars:
