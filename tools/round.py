@@ -148,36 +148,76 @@ def _area(ns):
     return a / 2
 
 
+def _samples(ns, per_seg=6):
+    """Dense points along the contour, for a local thickness estimate."""
+    pts = []
+    n = len(ns)
+    for i in range(n):
+        seg, line = _seg(ns[i], ns[(i + 1) % n])
+        if line:
+            a, b = seg[0], seg[3]
+            pts += [(a[0] + (b[0] - a[0]) * t / per_seg, a[1] + (b[1] - a[1]) * t / per_seg)
+                    for t in range(per_seg)]
+        else:
+            pts += [_cubic(seg, t / per_seg) for t in range(per_seg)]
+    return pts
+
+
+def _thickness(pts, node_xy, skip):
+    """Nearest bit of outline that is not one of the edges leaving the corner:
+    the local width of the stroke, which caps how much a cut may take."""
+    best = float("inf")
+    for x, y in pts:
+        if skip(x, y):
+            continue
+        d = math.hypot(x - node_xy[0], y - node_xy[1])
+        if d < best:
+            best = d
+    return best
+
+
 def corner_flags(segs, min_turn=MIN_TURN):
-    """One flag per node: round this join? Allo only rounds the corners of a
-    polygon: a join where either side is a curve (the end of a stroke, a bowl
-    meeting a stem) is drawn sharp, and its curve keeps its shape."""
+    """One flag per node: round this join?
+
+    Allo rounds the outside of a letter and the waists where two curves meet,
+    and leaves the sharp T-joints of one stroke into another alone (see b, B, n),
+    so: convex joins are rounded; concave ones only when a curve takes part.
+    A join with a tiny edge beside it (Inter leaves 10-unit ledges at some
+    diagonals) is skipped - a fillet smaller than the ledge reads as a step."""
     ns = nodes(segs)
     sign = 1.0 if _area(ns) > 0 else -1.0
     flags = []
     for i, node in enumerate(ns):
         seg_in, line_in = _seg(ns[i - 1], node)
         seg_out, line_out = _seg(node, ns[(i + 1) % len(ns)])
-        if not (line_in and line_out):
-            flags.append(False)
-            continue
         d_in = _tangent(seg_in, 1.0)
         d_out = _tangent(seg_out, 0.0)
         turn = math.acos(max(-1.0, min(1.0, d_in[0] * d_out[0] + d_in[1] * d_out[1])))
+        if turn < min_turn:
+            flags.append(False)
+            continue
+        shortest = min(_length(seg_in, line_in), _length(seg_out, line_out))
+        if shortest < 4 * FLAT:
+            flags.append(False)
+            continue
         cross = d_in[0] * d_out[1] - d_in[1] * d_out[0]
-        flags.append(turn >= min_turn and cross * sign > 0)
+        convex = cross * sign > 0
+        flags.append(convex or not (line_in and line_out))
     return flags
 
 
 def round_contour(segs, r, k, flags=None, min_turn=MIN_TURN):
-    """Cut every corner back by r and bridge it with a k-superellipse. With
-    `flags`, the decision comes from outside, so every master rounds the same
-    joins even where its own outline sits on the edge of the threshold."""
+    """Cut convex corners back and fill concave ones: Allo rounds the outside of
+    a letter and the corners of its counters, so every join is bridged with a
+    k-superellipse, only the side to bulge toward differs. With `flags`, the
+    decision comes from outside so every master rounds the same joins."""
     ns = nodes(segs)
     if flags is None:
         flags = corner_flags(segs, min_turn)
     if len(flags) != len(ns):
         raise ValueError(f"corner mask has {len(flags)} flags for {len(ns)} nodes")
+    sign = 1.0 if _area(ns) > 0 else -1.0
+    pts = _samples(ns)
     out = []
     n = len(ns)
     for i, node in enumerate(ns):
@@ -188,17 +228,20 @@ def round_contour(segs, r, k, flags=None, min_turn=MIN_TURN):
         seg_in, line_in = _seg(prev, node)
         seg_out, line_out = _seg(node, nxt)
         len_in, len_out = _length(seg_in, line_in), _length(seg_out, line_out)
-        # a corner may take half its edge: at that size two cuts meet and the
-        # stem end reads as a peak, so keep a hair of flat between them
-        radius = max(MIN_RADIUS, min(r, 0.5 * len_in - FLAT, 0.5 * len_out - FLAT))
+        d_in = _tangent(seg_in, 1.0)
+        d_out = _tangent(seg_out, 0.0)
+        # a cut may take half an edge, but never more than the stroke is thick
+        thick = _thickness(pts, node["p"], lambda x, y: math.dist((x, y), node["p"]) < max(len_in, len_out) * 0.35)
+        limit = min(0.5 * len_in - FLAT, 0.5 * len_out - FLAT)
+        if thick > 0:
+            limit = min(limit, 0.9 * thick)
+        radius = max(MIN_RADIUS, min(r, limit))
         left, _ = _split(seg_in, _param_at(seg_in, line_in, radius, from_end=True))
         _, right = _split(seg_out, _param_at(seg_out, line_out, radius, from_end=False))
         start, end = left[3], right[0]
-        dir_in = _tangent(left, 1.0)
-        dir_out = _tangent(right, 0.0)
         before = {"p": start, "in": None if line_in else left[2],
-                  "out": (start[0] + dir_in[0] * k * radius, start[1] + dir_in[1] * k * radius)}
-        after = {"p": end, "in": (end[0] - dir_out[0] * k * radius, end[1] - dir_out[1] * k * radius),
+                  "out": (start[0] + d_in[0] * k * radius, start[1] + d_in[1] * k * radius)}
+        after = {"p": end, "in": (end[0] - d_out[0] * k * radius, end[1] - d_out[1] * k * radius),
                  "out": None if line_out else right[1]}
         out += [before, after]
     return segments(out)

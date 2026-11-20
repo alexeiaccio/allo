@@ -32,10 +32,10 @@
       <point x="492.3360902255639" y="1164.0" type="line"/>
     </contour>
     <contour>
-      <point x="797.7750000000001" y="-320.0" type="line" smooth="yes"/>
-      <point x="691.2018199480422" y="-320.0"/>
-      <point x="653.5" y="-282.298180051958"/>
-      <point x="653.5" y="-175.72500000000002" type="curve" smooth="yes"/>
+      <point x="797.5" y="-320.0" type="line" smooth="yes"/>
+      <point x="691.1299571825891" y="-320.0"/>
+      <point x="653.5" y="-282.3700428174109"/>
+      <point x="653.5" y="-176.0" type="curve" smooth="yes"/>
       <point x="653.5" y="0.0" type="line"/>
       <point x="604.8300751879699" y="0.0" type="line" smooth="yes"/>
       <point x="571.0945761760006" y="0.0"/>

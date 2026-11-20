@@ -34,6 +34,7 @@ from fontTools.misc.transform import Transform
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.pointPen import SegmentToPointPen
 from fontTools.pens.recordingPen import DecomposingRecordingPen, RecordingPen
+from round import round_all
 
 from round import corner_flags, round_all
 from fontTools.pens.svgPathPen import SVGPathPen
@@ -113,6 +114,9 @@ def quad_to_cubic(segs):
         if op in ("moveTo", "lineTo"):
             cur = pts[0]
             out.append((op, pts))
+        elif op == "curveTo":
+            cur = pts[-1]
+            out.append((op, pts))
         elif op == "closePath":
             out.append((op, pts))
         elif op == "qCurveTo":
@@ -165,6 +169,41 @@ def sheared(contours, slant):
     if not slant:
         return contours
     return [[(op, tuple((x + slant * y, y) for x, y in pts)) for op, pts in c] for c in contours]
+
+
+def _reverse(segs):
+    from fontTools.pens.reverseContourPen import ReverseContourPen
+    rec = RecordingPen()
+    pen = ReverseContourPen(rec)
+    for op, pts in segs:
+        getattr(pen, op)(*pts)
+    return rec.value
+
+
+def mirror_contours(font, name, adv):
+    """The glyph's own contours mirrored left to right. A mirror flips the
+    winding, so each contour is reversed back and the fill stays the same."""
+    pen = DecomposingRecordingPen(font)
+    font[name].draw(pen)
+    # mirroring flips the winding of every contour, and since it flips all of
+    # them the same way the fill stays right; reversing the points to restore
+    # Allo's direction would drop coincident points in some masters and break
+    # interpolation, so the flip is left in.
+    return [[(op, tuple((adv - x, y) for x, y in pts)) for op, pts in c]
+            for c in _split(quad_to_cubic(pen.value))]
+
+
+def scaled_contours(font, name, sx, sy):
+    """The glyph's own contours scaled about the origin, winding kept."""
+    pen = DecomposingRecordingPen(font)
+    font[name].draw(pen)
+    return [[(op, tuple((x * sx, y * sy) for x, y in pts)) for op, pts in c]
+            for c in _split(quad_to_cubic(pen.value))]
+
+
+def polygon(points):
+    """A sharp closed contour; round_all then gives it Allo's corners."""
+    return [("moveTo", (points[0],))] + [("lineTo", (p,)) for p in points[1:]] + [("closePath", ())]
 
 
 def fitted(contours, sx, sy, dx=0.0):
@@ -246,6 +285,15 @@ class Metrics:
     def width(self, name):
         return self.font[name].width
 
+    def stem(self, name="H", at=None):
+        """Width of a stem, measured where the outline clearly crosses it."""
+        at = at if at is not None else self.cap * 0.22
+        hits = crossings(self.font, name, at)
+        return hits[1] - hits[0]
+
+    def lsb(self, name="H"):
+        return min(p.x for c in self.font[name].contours for p in c.points)
+
     def mark(self, base, mark):
         """Where a combining mark sits in a finished Latin glyph. The oblique
         statics carry no components (their accents are drawn in), so their
@@ -288,6 +336,10 @@ SAME_AS_LATIN = {
     0x0443: "y", 0x0445: "x",
 }
 MARKED = {0x0401: ("E", "Edieresis"), 0x0451: ("e", "edieresis")}
+# И is N mirrored: taking Allo's own N keeps its diagonal-to-stem joins, which
+# Inter draws with a small ledge that reads as a step after rounding.
+MIRRORED = {0x0418: "N"}
+MIRRORED_MARKED = {0x0419: ("N", "Ibreve")}   # the same N plus a breve
 
 RU = [0x0401] + list(range(0x0410, 0x0430)) + list(range(0x0430, 0x0450)) + [0x0451]
 SLAV = RU + [0x0400, 0x0402, 0x0403, 0x0404, 0x0405, 0x0406, 0x0407, 0x0408, 0x0409, 0x040A,
@@ -304,6 +356,22 @@ def name_of(code):
     return f"uni{code:04X}"
 
 
+def _three(m, sx_ratio):
+    sx_ratio = sx_ratio
+    sy_ratio = m.xh / m.cap
+    return (round(m.width("three") * sx_ratio),
+            scaled_contours(m.font, "three", sx_ratio, sy_ratio))
+
+
+def _crossings_of(contours, at):
+    f = ufoLib2.Font()
+    g = f.newGlyph("probe")
+    g.width = 1000
+    for s in contours:
+        g.contours.append(to_contour(s))
+    return crossings(f, "probe", at)
+
+
 def build(m, chars):
     """Returns {glyph name: (advance, [contours], [(base, dx, dy)])}."""
     g = {}
@@ -313,6 +381,39 @@ def build(m, chars):
         if code in SAME_AS_LATIN:
             lat = SAME_AS_LATIN[code]
             g[name] = (m.width(lat), [], [(lat, 0, 0)])
+        elif code in MIRRORED:
+            lat = MIRRORED[code]
+            adv = m.width(lat)
+            g[name] = (adv, mirror_contours(m.font, lat, adv), [])
+        elif code == 0x043B:                      # л: drawn in Allo's language
+            u, S, C = m.lsb("H"), m.stem("H"), m.cap
+            adv = m.width("A")
+            xr = adv - u
+            dx1 = u + 0.30 * (xr - u)
+            lean = 0.16 * (xr - dx1)
+            g[name] = (adv, round_all([
+                polygon([(u, C - S), (xr, C - S), (xr, C), (u, C)]),
+                polygon([(xr - S, 0), (xr, 0), (xr, C), (xr - S, C)]),
+                polygon([(u, 0), (dx1, 0), (dx1 + lean, C - S), (u + lean, C - S)]),
+            ], m.r_u, m.k), [])
+        elif code == 0x0437:                      # з: Allo's three at x-height
+            adv, contours = _three(m, 0.95)
+            g[name] = (adv, contours, [])
+        elif code == 0x044D:                      # э: Allo's c mirrored, plus a bar
+            adv = m.width("c")
+            u = m.lsb("n")
+            hits = crossings(m.font, "o", m.xh / 2)
+            S = hits[1] - hits[0]                  # the round letters' stroke weight
+            bar = polygon([(u, m.xh / 2 + S / 2), (0.52 * adv, m.xh / 2 + S / 2),
+                           (0.52 * adv, m.xh / 2 - S / 2), (u, m.xh / 2 - S / 2)])
+            g[name] = (adv, mirror_contours(m.font, "c", adv) + round_all([bar], m.r_l, m.k), [])
+        elif code in MIRRORED_MARKED:
+            lat, done = MIRRORED_MARKED[code]
+            adv = m.width(lat)
+            dx, dy = m.mark(done, "brevecomb")
+            bw = m.bounds("brevecomb")
+            g[name] = (adv, mirror_contours(m.font, lat, adv),
+                       [("brevecomb", adv / 2 - (dx + (bw[0] + bw[2]) / 2), dy)])
         elif code in MARKED:
             base, done = MARKED[code]
             dx, dy = m.mark(done, "dieresiscomb")
@@ -354,7 +455,7 @@ def to_contour(segs):
     for op, pts in segs:
         getattr(pen, op)(*pts)
     points = c.points
-    if (len(points) > 3 and points[-1].type in ("line", "curve")
+    if (len(points) > 3 and points[-1].type == "curve"
             and abs(points[-1].x - points[0].x) < 1e-6
             and abs(points[-1].y - points[0].y) < 1e-6):
         points.pop()
