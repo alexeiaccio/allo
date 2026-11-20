@@ -17,6 +17,7 @@ import math
 
 MIN_TURN = math.radians(35)      # ignore joins this shallow: they read as curves
 MIN_RADIUS = 1.0                 # keep a point structure even where r is 0
+FLAT = 1.5                       # leave this much of an edge between two cuts
 
 
 def _unit(a, b):
@@ -108,28 +109,35 @@ def _length(seg, is_line, samples=24):
     return sum(math.dist(pts[i], pts[i + 1]) for i in range(samples))
 
 
-def _cut(seg, is_line, dist, from_end, samples=24):
-    """Point at arc distance dist from one end of the segment, and its tangent."""
+def _param_at(seg, is_line, dist, from_end, samples=32):
+    """Parameter at which the segment has covered `dist` from one end."""
     if is_line:
-        p0, _, _, p3 = seg
-        d = _unit(p0, p3) if not from_end else _unit(p3, p0)
-        base = p3 if from_end else p0
-        return (base[0] + d[0] * dist, base[1] + d[1] * dist), (_unit(p3, p0) if from_end else _unit(p0, p3))
+        total = math.dist(seg[0], seg[3]) or 1.0
+        t = min(1.0, dist / total)
+        return 1.0 - t if from_end else t
     order = range(samples - 1, -1, -1) if from_end else range(1, samples + 1)
-    prev_t = 1.0 if from_end else 0.0
-    acc = 0.0
+    prev_t, acc = (1.0 if from_end else 0.0), 0.0
     for i in order:
         t = i / samples
         step = math.dist(_cubic(seg, prev_t), _cubic(seg, t))
         if acc + step >= dist:
-            point = _cubic(seg, t)
-            tangent = _tangent(seg, t)
-            return point, (tangent if not from_end else (-tangent[0], -tangent[1]))
+            frac = (dist - acc) / step if step else 0.0
+            return prev_t + (t - prev_t) * frac
         acc += step
         prev_t = t
-    end = seg[3] if from_end else seg[0]
-    tangent = _tangent(seg, 1.0 if from_end else 0.0)
-    return end, (tangent if not from_end else (-tangent[0], -tangent[1]))
+    return 1.0 if from_end else 0.0
+
+
+def _split(seg, t):
+    """de Casteljau: the two exact halves of a cubic at t."""
+    p0, c1, c2, p3 = seg
+    a = ((p0[0] + (c1[0] - p0[0]) * t, p0[1] + (c1[1] - p0[1]) * t))
+    b = ((c1[0] + (c2[0] - c1[0]) * t, c1[1] + (c2[1] - c1[1]) * t))
+    c = ((c2[0] + (p3[0] - c2[0]) * t, c2[1] + (p3[1] - c2[1]) * t))
+    d = ((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t))
+    e = ((b[0] + (c[0] - b[0]) * t, b[1] + (c[1] - b[1]) * t))
+    f = ((d[0] + (e[0] - d[0]) * t, d[1] + (e[1] - d[1]) * t))
+    return (p0, a, d, f), (f, e, c, p3)
 
 
 def _area(ns):
@@ -141,16 +149,18 @@ def _area(ns):
 
 
 def corner_flags(segs, min_turn=MIN_TURN):
-    """One flag per node: round this join? Measured on the real tangents, and
-    only where the join is convex for the region its contour encloses. Allo
-    leaves the inner joins sharp (b, B, n) and rounds the outside corners and
-    the corners of a counter, so a cut that would eat ink never happens."""
+    """One flag per node: round this join? Allo only rounds the corners of a
+    polygon: a join where either side is a curve (the end of a stroke, a bowl
+    meeting a stem) is drawn sharp, and its curve keeps its shape."""
     ns = nodes(segs)
     sign = 1.0 if _area(ns) > 0 else -1.0
     flags = []
     for i, node in enumerate(ns):
-        seg_in, _ = _seg(ns[i - 1], node)
-        seg_out, _ = _seg(node, ns[(i + 1) % len(ns)])
+        seg_in, line_in = _seg(ns[i - 1], node)
+        seg_out, line_out = _seg(node, ns[(i + 1) % len(ns)])
+        if not (line_in and line_out):
+            flags.append(False)
+            continue
         d_in = _tangent(seg_in, 1.0)
         d_out = _tangent(seg_out, 0.0)
         turn = math.acos(max(-1.0, min(1.0, d_in[0] * d_out[0] + d_in[1] * d_out[1])))
@@ -178,22 +188,18 @@ def round_contour(segs, r, k, flags=None, min_turn=MIN_TURN):
         seg_in, line_in = _seg(prev, node)
         seg_out, line_out = _seg(node, nxt)
         len_in, len_out = _length(seg_in, line_in), _length(seg_out, line_out)
-        radius = min(max(r, MIN_RADIUS), 0.45 * min(len_in, len_out))
-        start, dir_in = _cut(seg_in, line_in, radius, from_end=True)
-        end, dir_out = _cut(seg_out, line_out, radius, from_end=False)
-        # the incoming segment now ends at the cut point, keeping its tangent
-        h_in = node["in"]
-        if h_in is not None:
-            keep = min(math.dist(h_in, node["p"]), max(0.0, len_in - radius))
-            h_in = (start[0] - dir_in[0] * keep, start[1] - dir_in[1] * keep)
-        h_out = node["out"]
-        if h_out is not None:
-            keep = min(math.dist(h_out, node["p"]), max(0.0, len_out - radius))
-            h_out = (end[0] + dir_out[0] * keep, end[1] + dir_out[1] * keep)
-        before = {"p": start, "in": h_in,
+        # a corner may take half its edge: at that size two cuts meet and the
+        # stem end reads as a peak, so keep a hair of flat between them
+        radius = max(MIN_RADIUS, min(r, 0.5 * len_in - FLAT, 0.5 * len_out - FLAT))
+        left, _ = _split(seg_in, _param_at(seg_in, line_in, radius, from_end=True))
+        _, right = _split(seg_out, _param_at(seg_out, line_out, radius, from_end=False))
+        start, end = left[3], right[0]
+        dir_in = _tangent(left, 1.0)
+        dir_out = _tangent(right, 0.0)
+        before = {"p": start, "in": None if line_in else left[2],
                   "out": (start[0] + dir_in[0] * k * radius, start[1] + dir_in[1] * k * radius)}
         after = {"p": end, "in": (end[0] - dir_out[0] * k * radius, end[1] - dir_out[1] * k * radius),
-                 "out": h_out}
+                 "out": None if line_out else right[1]}
         out += [before, after]
     return segments(out)
 
@@ -217,7 +223,8 @@ def _selfcheck():
     assert len(on) == 8, f"expected 8 on-curve points, got {len(on)}"
     # a corner is cut back by exactly r along both edges
     pts = [s[1][-1] for s in on]
-    assert (100.0, 0.0) in pts and (900.0, 0.0) in pts, pts
+    near = lambda q: any(abs(p[0] - q[0]) < 1e-6 and abs(p[1] - q[1]) < 1e-6 for p in pts)
+    assert near((100.0, 0.0)) and near((900.0, 0.0)), pts
     # sharp master: same structure, no visible rounding
     sharp = round_contour(square, 0.0, 0.7387)
     assert len(sharp) == len(got), "point structure must not depend on the radius"
@@ -226,7 +233,7 @@ def _selfcheck():
                ("lineTo", ((2000, 1000),)), ("lineTo", ((0, 1000),)), ("closePath", ())]
     got = round_contour(shallow, 100, 0.7387)
     on = [s[1][-1] for s in got if s[0] in ("moveTo", "lineTo", "curveTo")]
-    assert (1000.0, 0.0) in on, on
+    assert any(abs(p[0] - 1000.0) < 1e-6 and abs(p[1]) < 1e-6 for p in on), on
     assert len([s for s in got if s[0] == "curveTo"]) == 4, "four 90-degree joins round, the shallow one does not"
     print("round.py self-check ok")
 
