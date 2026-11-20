@@ -75,15 +75,87 @@ def corner_radius(ns, i):
     return min(math.dist(a, v), math.dist(v, b)) * 0.49
 
 
+def _cubic(seg, t):
+    p0, c1, c2, p3 = seg
+    mt = 1 - t
+    return (mt ** 3 * p0[0] + 3 * mt * mt * t * c1[0] + 3 * mt * t * t * c2[0] + t ** 3 * p3[0],
+            mt ** 3 * p0[1] + 3 * mt * mt * t * c1[1] + 3 * mt * t * t * c2[1] + t ** 3 * p3[1])
+
+
+def _tangent(seg, t):
+    p0, c1, c2, p3 = seg
+    mt = 1 - t
+    dx = 3 * mt * mt * (c1[0] - p0[0]) + 6 * mt * t * (c2[0] - c1[0]) + 3 * t * t * (p3[0] - c2[0])
+    dy = 3 * mt * mt * (c1[1] - p0[1]) + 6 * mt * t * (c2[1] - c1[1]) + 3 * t * t * (p3[1] - c2[1])
+    d = math.hypot(dx, dy) or 1.0
+    return dx / d, dy / d
+
+
+def _seg(a, b):
+    """The segment from node a to node b as a cubic and whether it is a line."""
+    is_line = a["out"] is None and b["in"] is None
+    c1 = a["out"] if a["out"] is not None else ((2 * a["p"][0] + b["p"][0]) / 3,
+                                                (2 * a["p"][1] + b["p"][1]) / 3)
+    c2 = b["in"] if b["in"] is not None else ((a["p"][0] + 2 * b["p"][0]) / 3,
+                                              (a["p"][1] + 2 * b["p"][1]) / 3)
+    return (a["p"], c1, c2, b["p"]), is_line
+
+
+def _length(seg, is_line, samples=24):
+    if is_line:
+        return math.dist(seg[0], seg[3])
+    pts = [_cubic(seg, i / samples) for i in range(samples + 1)]
+    return sum(math.dist(pts[i], pts[i + 1]) for i in range(samples))
+
+
+def _cut(seg, is_line, dist, from_end, samples=24):
+    """Point at arc distance dist from one end of the segment, and its tangent."""
+    if is_line:
+        p0, _, _, p3 = seg
+        d = _unit(p0, p3) if not from_end else _unit(p3, p0)
+        base = p3 if from_end else p0
+        return (base[0] + d[0] * dist, base[1] + d[1] * dist), (_unit(p3, p0) if from_end else _unit(p0, p3))
+    order = range(samples - 1, -1, -1) if from_end else range(1, samples + 1)
+    prev_t = 1.0 if from_end else 0.0
+    acc = 0.0
+    for i in order:
+        t = i / samples
+        step = math.dist(_cubic(seg, prev_t), _cubic(seg, t))
+        if acc + step >= dist:
+            point = _cubic(seg, t)
+            tangent = _tangent(seg, t)
+            return point, (tangent if not from_end else (-tangent[0], -tangent[1]))
+        acc += step
+        prev_t = t
+    end = seg[3] if from_end else seg[0]
+    tangent = _tangent(seg, 1.0 if from_end else 0.0)
+    return end, (tangent if not from_end else (-tangent[0], -tangent[1]))
+
+
+def _area(ns):
+    a = 0.0
+    for i, node in enumerate(ns):
+        j = (i + 1) % len(ns)
+        a += node["p"][0] * ns[j]["p"][1] - ns[j]["p"][0] * node["p"][1]
+    return a / 2
+
+
 def corner_flags(segs, min_turn=MIN_TURN):
-    """One flag per node: is this join sharp enough to be rounded?"""
+    """One flag per node: round this join? Measured on the real tangents, and
+    only where the join is convex for the region its contour encloses. Allo
+    leaves the inner joins sharp (b, B, n) and rounds the outside corners and
+    the corners of a counter, so a cut that would eat ink never happens."""
     ns = nodes(segs)
+    sign = 1.0 if _area(ns) > 0 else -1.0
     flags = []
     for i, node in enumerate(ns):
-        d_in = _unit(ns[i - 1]["p"], node["p"])
-        d_out = _unit(node["p"], ns[(i + 1) % len(ns)]["p"])
+        seg_in, _ = _seg(ns[i - 1], node)
+        seg_out, _ = _seg(node, ns[(i + 1) % len(ns)])
+        d_in = _tangent(seg_in, 1.0)
+        d_out = _tangent(seg_out, 0.0)
         turn = math.acos(max(-1.0, min(1.0, d_in[0] * d_out[0] + d_in[1] * d_out[1])))
-        flags.append(turn >= min_turn)
+        cross = d_in[0] * d_out[1] - d_in[1] * d_out[0]
+        flags.append(turn >= min_turn and cross * sign > 0)
     return flags
 
 
@@ -97,28 +169,32 @@ def round_contour(segs, r, k, flags=None, min_turn=MIN_TURN):
     if len(flags) != len(ns):
         raise ValueError(f"corner mask has {len(flags)} flags for {len(ns)} nodes")
     out = []
+    n = len(ns)
     for i, node in enumerate(ns):
         if not flags[i]:
             out.append(dict(node))
             continue
-        nxt = ns[(i + 1) % len(ns)]
-        d_in = _unit(ns[i - 1]["p"], node["p"])
-        d_out = _unit(node["p"], nxt["p"])
-        radius = min(max(r, MIN_RADIUS), corner_radius(ns, i))
-        p = node["p"]
-        start = (p[0] - d_in[0] * radius, p[1] - d_in[1] * radius)
-        end = (p[0] + d_out[0] * radius, p[1] + d_out[1] * radius)
-        # shorten the incoming segment to the cut point, keeping its tangent
+        prev, nxt = ns[i - 1], ns[(i + 1) % n]
+        seg_in, line_in = _seg(prev, node)
+        seg_out, line_out = _seg(node, nxt)
+        len_in, len_out = _length(seg_in, line_in), _length(seg_out, line_out)
+        radius = min(max(r, MIN_RADIUS), 0.45 * min(len_in, len_out))
+        start, dir_in = _cut(seg_in, line_in, radius, from_end=True)
+        end, dir_out = _cut(seg_out, line_out, radius, from_end=False)
+        # the incoming segment now ends at the cut point, keeping its tangent
         h_in = node["in"]
         if h_in is not None:
-            h_in = (start[0] - d_in[0] * math.dist(h_in, p), start[1] - d_in[1] * math.dist(h_in, p))
-        h_out = nxt.get("out")
-        before = {"p": start, "in": h_in, "out": (start[0] + d_in[0] * k * radius,
-                                                  start[1] + d_in[1] * k * radius)}
-        after = {"p": end, "in": (end[0] - d_out[0] * k * radius, end[1] - d_out[1] * k * radius),
-                 "out": None}
+            keep = min(math.dist(h_in, node["p"]), max(0.0, len_in - radius))
+            h_in = (start[0] - dir_in[0] * keep, start[1] - dir_in[1] * keep)
+        h_out = node["out"]
+        if h_out is not None:
+            keep = min(math.dist(h_out, node["p"]), max(0.0, len_out - radius))
+            h_out = (end[0] + dir_out[0] * keep, end[1] + dir_out[1] * keep)
+        before = {"p": start, "in": h_in,
+                  "out": (start[0] + dir_in[0] * k * radius, start[1] + dir_in[1] * k * radius)}
+        after = {"p": end, "in": (end[0] - dir_out[0] * k * radius, end[1] - dir_out[1] * k * radius),
+                 "out": h_out}
         out += [before, after]
-    # the outgoing handle of the node before a corner now belongs to the cut point
     return segments(out)
 
 

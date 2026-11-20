@@ -345,10 +345,20 @@ class _ContourPen:
 
 
 def to_contour(segs):
+    """Points for one contour. A contour that closes with a curve comes back
+    from the segment pen with a duplicate of its first point at the end; that
+    zero-length segment is what puts a cusp at a bowl terminal, so the duplicate
+    is dropped and the closing curve becomes the first point's incoming handles."""
     c = Contour()
     pen = SegmentToPointPen(_ContourPen(c))
     for op, pts in segs:
         getattr(pen, op)(*pts)
+    points = c.points
+    if (len(points) > 3 and points[-1].type in ("line", "curve")
+            and abs(points[-1].x - points[0].x) < 1e-6
+            and abs(points[-1].y - points[0].y) < 1e-6):
+        points.pop()
+        points[0].type = "curve"
     return c
 
 
