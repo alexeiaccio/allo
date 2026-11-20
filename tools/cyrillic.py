@@ -385,17 +385,15 @@ def build(m, chars):
             lat = MIRRORED[code]
             adv = m.width(lat)
             g[name] = (adv, mirror_contours(m.font, lat, adv), [])
-        elif code == 0x043B:                      # л: drawn in Allo's language
+        elif code == 0x043B:                      # л: one outline, slanted left side
             u, S, C = m.lsb("H"), m.stem("H"), m.cap
             adv = m.width("A")
             xr = adv - u
-            dx1 = u + 0.30 * (xr - u)
-            lean = 0.16 * (xr - dx1)
-            g[name] = (adv, round_all([
-                polygon([(u, C - S), (xr, C - S), (xr, C), (u, C)]),
-                polygon([(xr - S, 0), (xr, 0), (xr, C), (xr - S, C)]),
-                polygon([(u, 0), (dx1, 0), (dx1 + lean, C - S), (u + lean, C - S)]),
-            ], m.r_u, m.k), [])
+            lean = 0.16 * (xr - u)
+            g[name] = (adv, round_all([polygon([
+                (u, 0), (u + lean, C), (xr, C), (xr, 0),
+                (xr - S, 0), (xr - S, C - S), (u + lean + S, C - S), (u + S, 0),
+            ])], m.r_u, m.k), [])
         elif code == 0x0437:                      # з: Allo's three at x-height
             adv, contours = _three(m, 0.95)
             g[name] = (adv, contours, [])
