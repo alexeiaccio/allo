@@ -297,6 +297,8 @@ ZIP_README = '''
 
   CHARACTERS  ({characters})
     Latin        A–Z a–z, accented forms, Vietnamese, ẞ ß Æ æ Œ œ
+    Cyrillic     А–Я а–я, Ё ё, Ukrainian, Serbian, Kazakh,
+                 and the historic letters (249 characters)
     Figures      0–9  ⁰¹²³⁴⁵⁶⁷⁸⁹  ₀₁₂₃₄₅₆₇₈₉  ½ ⅓ ¼ ⅔ ¾ ⅛ ⅜ ⅝ ⅞
     Punctuation  ! ? ¡ ¿ … · • † ‡ § ¶ ‘ ’ “ ” « » ‹ › ‐ – — ‒
     Currency     $ ¢ £ ¥ € ₹ ₩ ₽ ₺ ₪ ฿ ₫ ₴ ₦ ₱ ₿ ƒ

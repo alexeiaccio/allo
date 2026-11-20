@@ -101,6 +101,16 @@ the variable font at opsz 14, ROND 50.
 
 Browsers turn ligatures off when letter-spacing is set. For code, use `font-variant-ligatures: no-contextual`.
 
+## Cyrillic
+
+249 characters: Russian, Ukrainian, Belarusian, Serbian, Macedonian, Bulgarian, Kazakh, Kyrgyz, Mongolian,
+Tajik, Uzbek, and the historic letters. The outlines come from Inter 4.1 (see Credit), fitted to every master and
+then rounded with the same superellipse and radius as the Latin, so Cyrillic follows `opsz`, `wght` and `ROND`
+like the rest of the font; the kerning pairs come from Inter too.
+
+Not there yet: the Serbian and Bulgarian letterforms (`б г д п т`) only exist in italic-style drawings, and Inter
+has no such variants to take them from, so those need to be drawn first.
+
 ## Build
 
 Python 3.9 or newer:
