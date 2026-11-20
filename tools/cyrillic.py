@@ -77,7 +77,8 @@ def copy_inter(m, chars):
     gs, cmap = font.getGlyphSet(), font.getBestCmap()
     ref = inter_measures(m.wght, m.opsz)
     fit_u = (m.width("H") / ref["adv_H"], m.cap / ref["cap"])
-    fit_l = (m.width("n") / ref["adv_n"], m.xh / ref["xh"])
+    # compare like with like: Inter's n ink top overshoots the nominal x-height
+    fit_l = (m.width("n") / ref["adv_n"], m.bounds("n")[3] / ref["xh"])
     out = {}
     for code in chars:
         if code not in cmap:
@@ -146,10 +147,12 @@ def measure(font):
 
 # ---------------------------------------------------------------- letter set
 # Same shape as Latin: Allo's own glyph, so Cyrillic matches the family exactly.
+# Lowercase к is not here: Allo's Latin k carries its arm above the x-height,
+# while Cyrillic к keeps it on the line, so that one comes from Inter.
 SAME_AS_LATIN = {
     0x0410: "A", 0x0412: "B", 0x0415: "E", 0x041A: "K", 0x041C: "M", 0x041D: "H",
     0x041E: "O", 0x0420: "P", 0x0421: "C", 0x0422: "T", 0x0425: "X",
-    0x0430: "a", 0x0435: "e", 0x043A: "k", 0x043E: "o", 0x0440: "p", 0x0441: "c",
+    0x0430: "a", 0x0435: "e", 0x043E: "o", 0x0440: "p", 0x0441: "c",
     0x0443: "y", 0x0445: "x",
 }
 MARKED = {0x0401: ("E", "Edieresis"), 0x0451: ("e", "edieresis")}
@@ -286,6 +289,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", default="ru", choices=sorted(STAGES))
     ap.add_argument("--write", action="store_true", help="save into every master")
+    ap.add_argument("--refresh", action="store_true", help="delete the stage's glyphs first")
+    ap.add_argument("--out", default="documentation/latin-metrics.md")
     ap.add_argument("--preview", action="store_true", help="render one master to PNG")
     ap.add_argument("--master", default="Allo-opsz14-wght400-ROND50.ufo")
     ap.add_argument("--weights", default="", help="comma list, e.g. 100,400,900")
@@ -336,6 +341,10 @@ def main():
     if args.write:
         for path in sorted(MASTERS.glob("*.ufo")):
             font = ufoLib2.Font.open(path)
+            if args.refresh:
+                for code in chars:
+                    if name_of(code) in font:
+                        del font[name_of(code)]
             added = apply(font, build(measure(font), chars))
             if added:
                 font.save(path, overwrite=True)

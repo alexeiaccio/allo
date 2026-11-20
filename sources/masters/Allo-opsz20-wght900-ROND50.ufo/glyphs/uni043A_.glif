@@ -1,8 +1,22 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="uni043A" format="2">
-  <advance width="1142"/>
+  <advance width="1226"/>
   <unicode hex="043A"/>
   <outline>
-    <component base="k"/>
+    <contour>
+      <point x="94.30385716076204" y="0.0" type="line"/>
+      <point x="94.30385716076204" y="1091.755003472649" type="line"/>
+      <point x="485.8261784960788" y="1091.755003472649" type="line"/>
+      <point x="485.8261784960788" y="679.195730032707" type="line"/>
+      <point x="544.359529056651" y="679.195730032707" type="line"/>
+      <point x="786.9470962745894" y="1091.755003472649" type="line"/>
+      <point x="1235.701870911717" y="1091.755003472649" type="line"/>
+      <point x="886.4535897810829" y="543.8873674649489" type="line"/>
+      <point x="1237.6529786275305" y="0.0" type="line"/>
+      <point x="783.0448808429621" y="0.0" type="line"/>
+      <point x="563.870606214787" y="374.08876894323936" type="line"/>
+      <point x="485.8261784960788" y="374.08876894323936" type="line"/>
+      <point x="485.8261784960788" y="0.0" type="line"/>
+    </contour>
   </outline>
 </glyph>
