@@ -13,10 +13,13 @@ Where the letters come from:
     small fit to each master's width and height.
 
 Inter has 249 Cyrillic characters, so the later stages are the same copy with
-a bigger set. Two known gaps, both deliberate for now:
-  * the ROND axis does not move the copied glyphs (same outline at every
-    roundness), so Cyrillic stays sharp while Latin rounds;
-  * no kern pairs yet.
+a bigger set. Every copied outline then goes through tools/round.py, which cuts
+its joins back by the radius and superellipse measured from the master's own H
+and n, so the Cyrillic follows ROND the way the Latin does. The corner decision
+is made once on a reference Inter instance, so all masters round the same joins
+and stay interpolation-compatible.
+
+Known gap for now: no kern pairs.
 """
 import argparse
 import dataclasses
@@ -30,7 +33,9 @@ import ufoLib2
 from fontTools.misc.transform import Transform
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.pointPen import SegmentToPointPen
-from fontTools.pens.recordingPen import DecomposingRecordingPen
+from fontTools.pens.recordingPen import DecomposingRecordingPen, RecordingPen
+
+from round import corner_flags, round_all
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.ttLib import TTFont
 from ufoLib2.objects import Component, Contour, Point
@@ -85,10 +90,56 @@ def copy_inter(m, chars):
             continue
         name = cmap[code]
         sx, sy = fit_l if code >= 0x0430 else fit_u
-        rec = DecomposingRecordingPen(gs)
-        gs[name].draw(rec)
+        raw = DecomposingRecordingPen(gs)
+        gs[name].draw(raw)
+        rec = RecordingPen()
+        for op, pts in quad_to_cubic(raw.value):
+            getattr(rec, op)(*pts)
         out[code] = (font["hmtx"][name][0] * sx, _split(rec.value), sx, sy)
     return out
+
+
+def quad_to_cubic(segs):
+    """One cubic for one quadratic, always: Inter's glyf is quadratic, and an
+    adaptive converter would give each master a different point count, which
+    breaks interpolation. TrueType's implied on-curve points are made explicit."""
+    out, cur = [], None
+    for op, pts in segs:
+        if op in ("moveTo", "lineTo"):
+            cur = pts[0]
+            out.append((op, pts))
+        elif op == "closePath":
+            out.append((op, pts))
+        elif op == "qCurveTo":
+            controls, end = list(pts[:-1]), pts[-1]
+            if end is None:
+                raise ValueError("all-quadratic closed contour")
+            chain, prev = [], cur
+            for i, c in enumerate(controls):
+                stop = ((c[0] + controls[i + 1][0]) / 2, (c[1] + controls[i + 1][1]) / 2) \
+                    if i + 1 < len(controls) else end
+                chain.append((c, stop))
+            for c, stop in chain:
+                c1 = (prev[0] + 2 / 3 * (c[0] - prev[0]), prev[1] + 2 / 3 * (c[1] - prev[1]))
+                c2 = (stop[0] + 2 / 3 * (c[0] - stop[0]), stop[1] + 2 / 3 * (c[1] - stop[1]))
+                out.append(("curveTo", (c1, c2, stop)))
+                prev = stop
+            cur = end
+        else:
+            raise ValueError(f"unsupported {op}")
+    return out
+
+
+@functools.lru_cache(maxsize=None)
+def corner_masks(code):
+    """Which joins to round, decided once on the reference instance so every
+    master rounds the same ones (at heavy weights some joins sit on the edge of
+    the threshold and would flip)."""
+    font = inter_at(400, 14)
+    gs, cmap = font.getGlyphSet(), font.getBestCmap()
+    raw = DecomposingRecordingPen(gs)
+    gs[cmap[code]].draw(raw)
+    return tuple(tuple(corner_flags(segs)) for segs in _split(quad_to_cubic(raw.value)))
 
 
 def _split(value):
@@ -111,11 +162,31 @@ def fitted(contours, sx, sy, dx=0.0):
 
 # ---------------------------------------------------------------- this master
 
+def corner(font, name="H"):
+    """(radius, k) of a drawn corner: how far it is cut off both edges, and
+    where the control points sit inside the join (H's bottom-left corner)."""
+    pts = font[name].contours[0].points
+    low, left = min(p.y for p in pts), min(p.x for p in pts)
+    for i, p in enumerate(pts):
+        if p.type != "curve" or p.y != low:
+            continue
+        c1, c2 = pts[i - 2], pts[i - 1]
+        if c1.x == left and c1.x < c2.x:
+            r = p.x - c1.x
+            if r <= 0:
+                return 0.0, 0.5523
+            return r, (r - (c1.y - p.y)) / r
+    return 0.0, 0.5523
+
+
 @dataclasses.dataclass
 class Metrics:
     font: ufoLib2.Font
     cap: float
     xh: float
+    r_u: float
+    r_l: float
+    k: float
     opsz: float
     wght: float
     rond: float
@@ -141,7 +212,9 @@ def measure(font):
         for tag in ("opsz", "wght", "ROND"):
             if b.startswith(tag):
                 vals[tag] = float(b[len(tag):])
-    return Metrics(font, font.info.capHeight, font.info.xHeight,
+    r_u, k = corner(font, "H")
+    r_l, _ = corner(font, "n")
+    return Metrics(font, font.info.capHeight, font.info.xHeight, r_u, r_l, k,
                    vals["opsz"], vals["wght"], vals["ROND"])
 
 
@@ -188,7 +261,9 @@ def build(m, chars):
         else:
             todo.append(code)
     for code, (adv, contours, sx, sy) in copy_inter(m, todo).items():
-        g[name_of(code)] = (round(adv), fitted(contours, sx, sy), [])
+        r = m.r_u if code < 0x0430 else m.r_l
+        g[name_of(code)] = (round(adv),
+                            round_all(fitted(contours, sx, sy), r, m.k, corner_masks(code)), [])
     return g
 
 
